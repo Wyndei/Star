@@ -15,6 +15,11 @@ void ChunkLeaf::_bind_methods() {
     ClassDB::bind_method(D_METHOD("chunk_update", "player_pos"), &ChunkLeaf::chunk_update);
     ClassDB::bind_method(D_METHOD("mesh_chunk"), &ChunkLeaf::mesh_chunk);
     
+    ClassDB::bind_method(D_METHOD("set_subd_dist", "new_subd_dist"), &ChunkLeaf::set_subd_dist); // subdivide distance
+    ClassDB::bind_method(D_METHOD("get_subd_dist"), &ChunkLeaf::get_subd_dist);
+    ClassDB::bind_method(D_METHOD("set_coll_dist", "new_coll_dist"), &ChunkLeaf::set_coll_dist); // collapse distance
+    ClassDB::bind_method(D_METHOD("get_coll_dist"), &ChunkLeaf::get_coll_dist);
+
     ClassDB::bind_method(D_METHOD("set_material", "new_material"), &ChunkLeaf::set_material);
     ClassDB::bind_method(D_METHOD("get_material"), &ChunkLeaf::get_material);
 
@@ -222,6 +227,11 @@ void ChunkTree::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_min_chunk_size", "new_min_chunk_size"), &ChunkTree::set_min_chunk_size);
     ClassDB::bind_method(D_METHOD("get_min_chunk_size"), &ChunkTree::get_min_chunk_size);
 
+    ClassDB::bind_method(D_METHOD("set_subd_dist", "new_subd_dist"), &ChunkTree::set_subd_dist); // subdivide distance
+    ClassDB::bind_method(D_METHOD("get_subd_dist"), &ChunkTree::get_subd_dist);
+    ClassDB::bind_method(D_METHOD("set_coll_dist", "new_coll_dist"), &ChunkTree::set_coll_dist); // collapse distance
+    ClassDB::bind_method(D_METHOD("get_coll_dist"), &ChunkTree::get_coll_dist);
+
     ClassDB::bind_method(D_METHOD("set_material", "new_material"), &ChunkTree::set_material);
     ClassDB::bind_method(D_METHOD("get_material"), &ChunkTree::get_material);
 
@@ -229,6 +239,9 @@ void ChunkTree::_bind_methods() {
 
     ADD_PROPERTY(PropertyInfo(Variant::INT, "max_level"), "set_max_level", "get_max_level");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "min_chunk_size"), "set_min_chunk_size", "get_min_chunk_size");
+    
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "subd_dist"), "set_subd_dist", "get_subd_dist");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "coll_dist"), "set_coll_dist", "get_coll_dist");
     
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material", "get_material");
 }
@@ -240,11 +253,11 @@ ChunkTree::~ChunkTree() {
 }
 
 void ChunkTree::_ready(){
-    if (Engine::get_singleton()->is_editor_hint()) {
-        set_process_mode(Node::ProcessMode::PROCESS_MODE_DISABLED);
-        return;
-    }
-    new_root(Vector2i(0,0));
+    // if (Engine::get_singleton()->is_editor_hint()) {
+    //     set_process_mode(Node::ProcessMode::PROCESS_MODE_DISABLED);
+    //     return;
+    // }
+    // new_root(Vector2i(0,0));
 }
 
 void ChunkTree::new_root(Vector2i root_pos){

@@ -36,6 +36,9 @@ class ChunkLeaf : public Leaf{
     private:
         int level = 8;
         int min_chunk_size = 8;
+        int subd_dist = 4;
+        int coll_dist = 6;
+
         Vector2i pos = Vector2i(0,0);
         
         bool has_children = false;
@@ -70,6 +73,12 @@ class ChunkLeaf : public Leaf{
     void set_min_chunk_size(const int new_min){min_chunk_size = new_min;}
     int get_min_chunk_size(){return min_chunk_size;}
 
+    void set_subd_dist(const int new_subd_dist){subd_dist = new_subd_dist;}
+    int get_subd_dist() {return subd_dist;}
+
+    void set_coll_dist(const int new_coll_dist){coll_dist = new_coll_dist;}
+    int get_coll_dist() {return coll_dist;}
+
     void set_material(const Ref<Material> &new_material){terrain_material = new_material;}
     Ref<Material> get_material(){return terrain_material;}
 
@@ -79,8 +88,8 @@ class ChunkLeaf : public Leaf{
 
     Ref<ArrayMesh> mesh_chunk();
 
-    bool should_subdivide(Vector2i player_pos){if (player_pos.distance_to(pos) < get_size() * 4) return true; else {return false;};}
-    bool should_collapse(Vector2i player_pos){if (player_pos.distance_to(pos) > get_size() * 6) return true; else {return false;};}
+    bool should_subdivide(Vector2i player_pos){if (player_pos.distance_to(pos) < get_size() * subd_dist) return true; else {return false;};}
+    bool should_collapse(Vector2i player_pos){if (player_pos.distance_to(pos) > get_size() * coll_dist) return true; else {return false;};}
 
     void subdivide();
     void collapse();
@@ -99,6 +108,8 @@ class ChunkTree : public QuadTree {
 
         int max_level = 8;
         int min_chunk_size = 8; // in meters
+        int subd_dist = 4;
+        int coll_dist = 6;
 
         Ref<Material> terrain_material;
         // (largest_chunk_size = smallest_chunk_size * highest_level) in meters
@@ -124,6 +135,12 @@ class ChunkTree : public QuadTree {
 
         void set_min_chunk_size(const int new_min){min_chunk_size = new_min;}
         int get_min_chunk_size(){return min_chunk_size;}
+
+        void set_subd_dist(const int new_subd_dist){subd_dist = new_subd_dist;}
+        int get_subd_dist() {return subd_dist;}
+
+        void set_coll_dist(const int new_coll_dist){coll_dist = new_coll_dist;}
+        int get_coll_dist() {return coll_dist;}
 
         void set_material(const Ref<Material> &new_material){terrain_material = new_material;}
         Ref<Material> get_material(){return terrain_material;}

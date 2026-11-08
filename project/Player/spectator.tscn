@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://dyxoxdvt6jpbx"]
+
+[ext_resource type="Script" uid="uid://dkeih3eeg8fyh" path="res://Player/Spectator.gd" id="1_dd5sc"]
+[ext_resource type="Script" uid="uid://cublglxfwg6oa" path="res://Player/fps_label.gd" id="2_6wgb8"]
+[ext_resource type="Script" uid="uid://c3ejdqb6xvd3d" path="res://Player/pos_label.gd" id="3_gxbeh"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_kdcuc"]
+
+[node name="Spectator" type="CharacterBody3D" unique_id=762592508]
+floor_snap_length = 0.0
+script = ExtResource("1_dd5sc")
+
+[node name="Camera" type="Camera3D" parent="." unique_id=9452114]
+cull_mask = 1048511
+
+[node name="CrossHair" type="ColorRect" parent="." unique_id=1635763562]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -3.5
+offset_top = -3.5
+offset_right = 3.5
+offset_bottom = 3.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Outline" type="ColorRect" parent="CrossHair" unique_id=815969036]
+z_index = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.5
+offset_top = -2.5
+offset_right = 2.5
+offset_bottom = 2.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=924976823]
+shape = SubResource("SphereShape3D_kdcuc")
+
+[node name="Light" type="OmniLight3D" parent="." unique_id=1350077664]
+visible = false
+
+[node name="FPSLabel" type="Label" parent="." unique_id=1301365156]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "FPS: 2"
+script = ExtResource("2_6wgb8")
+
+[node name="PosLabel" type="Label" parent="." unique_id=430008491 node_paths=PackedStringArray("player")]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
+text = "X: 2 Y: 3 Z: 4"
+script = ExtResource("3_gxbeh")
+player = NodePath("..")

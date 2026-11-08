@@ -40,7 +40,7 @@ QuadTree::~QuadTree() {
 }
 
 void QuadTree::new_root(){
-
+    
 };
 
 void QuadTree::free_root(){

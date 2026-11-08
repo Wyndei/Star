@@ -4,6 +4,11 @@
 [ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Def_Environment.tres" id="2_5a7ea"]
 [ext_resource type="PackedScene" uid="uid://dyxoxdvt6jpbx" path="res://Player/spectator.tscn" id="2_go701"]
 [ext_resource type="Script" uid="uid://cqmaginlmrvk5" path="res://Scenes/chunk_tree.gd" id="4_8j60k"]
+[ext_resource type="Shader" uid="uid://oythdbufhy1k" path="res://Scenes/terrain_shader.gdshader" id="4_fo5ed"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_k7acu"]
+render_priority = 0
+shader = ExtResource("4_fo5ed")
 
 [node name="World" type="Node3D" unique_id=1436071097]
 script = ExtResource("1_a02cp")
@@ -19,6 +24,7 @@ environment = ExtResource("2_5a7ea")
 [node name="Spectator" parent="." unique_id=762592508 instance=ExtResource("2_go701")]
 
 [node name="ChunkTree" type="ChunkTree" parent="." unique_id=109956114 node_paths=PackedStringArray("player")]
+material = SubResource("ShaderMaterial_k7acu")
 process_mode = 4
 script = ExtResource("4_8j60k")
 player = NodePath("../Spectator")

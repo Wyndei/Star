@@ -23,8 +23,18 @@
 #include <godot_cpp/classes/box_mesh.hpp>
 #include <godot_cpp/classes/array_mesh.hpp>
 
+#include <godot_cpp/classes/static_body3d.hpp>
+#include <godot_cpp/classes/collision_shape3d.hpp>
+#include <godot_cpp/classes/concave_polygon_shape3d.hpp>
+
 #include <godot_cpp/classes/node3d.hpp>
 #include <godot_cpp/classes/material.hpp>
+
+#include <godot_cpp/classes/thread.hpp>
+#include <godot_cpp/classes/worker_thread_pool.hpp>
+
+#include <godot_cpp/variant/callable.hpp>
+#include <godot_cpp/variant/callable_method_pointer.hpp>
 
 namespace godot {
 
@@ -45,7 +55,10 @@ class ChunkLeaf : public Leaf{
 
         MeshInstance3D *test_mesh;
         MeshInstance3D *chunk_mesh;
-    
+        StaticBody3D *chunk_body;
+        CollisionShape3D *chunk_coll;
+
+
         ChunkLeaf *top_left;
         ChunkLeaf *top_right;
         ChunkLeaf *bot_left;
@@ -85,8 +98,12 @@ class ChunkLeaf : public Leaf{
     int get_size(){return min_chunk_size * pow(2,level);}
     
     void chunk_update(Vector2i player_pos);
+    
+    void generate_mesh();
+    void generate_collision();
 
-    Ref<ArrayMesh> mesh_chunk();
+    void set_mesh(Array surface_array);
+    void set_coll(Ref<ConcavePolygonShape3D> new_coll);
 
     bool should_subdivide(Vector2i player_pos){if (player_pos.distance_to(pos) < get_size() * subd_dist) return true; else {return false;};}
     bool should_collapse(Vector2i player_pos){if (player_pos.distance_to(pos) > get_size() * coll_dist) return true; else {return false;};}
@@ -113,6 +130,7 @@ class ChunkTree : public QuadTree {
 
         Ref<Material> terrain_material;
         // (largest_chunk_size = smallest_chunk_size * highest_level) in meters
+
 
 
     protected:

@@ -12,6 +12,7 @@ script = ExtResource("1_dd5sc")
 
 [node name="Camera" type="Camera3D" parent="." unique_id=9452114]
 cull_mask = 1048511
+far = 40000.0
 
 [node name="CrossHair" type="ColorRect" parent="." unique_id=1635763562]
 anchors_preset = 8
@@ -45,7 +46,9 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=924976823]
+visible = false
 shape = SubResource("SphereShape3D_kdcuc")
+debug_color = Color(0, 0.6, 0.69803923, 0)
 
 [node name="Light" type="OmniLight3D" parent="." unique_id=1350077664]
 visible = false

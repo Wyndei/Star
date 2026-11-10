@@ -10,14 +10,14 @@ func _ready() -> void:
 	var player_pos : Vector2i = Vector2i(int(floor(player.position.x)),int(floor(player.position.z)))
 	new_root(Vector2i(player_pos.x,player_pos.y));
 	update()
-
+	
 func update():
 	var player_pos : Vector2i = Vector2i(int(floor(player.position.x)),int(floor(player.position.z)))
 	chunk_updates(player_pos)
 
 func subdivide_chunks():
 	
-	if player_pos_buffer.distance_to(Vector2(player.global_position.x,player.global_position.z)) < 50:
+	if player_pos_buffer.distance_to(Vector2(player.global_position.x,player.global_position.z)) < 10:
 		return
 	player_pos_buffer = Vector2(player.global_position.x,player.global_position.z)
 	
@@ -25,7 +25,5 @@ func subdivide_chunks():
 	chunk_updates(player_pos)
 	
 
-
-
-func _on_chunk_subdivide_timeout() -> void:
+func _on_chunk_update_timeout() -> void:
 	subdivide_chunks()

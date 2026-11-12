@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ui7fpeuau5xv"]
 
 [ext_resource type="Script" uid="uid://cqmaginlmrvk5" path="res://Scenes/chunk_tree.gd" id="1_5a7ea"]
-[ext_resource type="Material" uid="uid://biro3ukjcx06a" path="res://Scenes/terrain_shader.tres" id="1_8j60k"]
+[ext_resource type="Material" uid="uid://b8oqfos80kesi" path="res://Scenes/grid_material.tres" id="1_8j60k"]
 [ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Def_Environment.tres" id="2_5a7ea"]
 [ext_resource type="PackedScene" uid="uid://dyxoxdvt6jpbx" path="res://Player/spectator.tscn" id="4_8j60k"]
 

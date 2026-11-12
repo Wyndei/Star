@@ -213,37 +213,46 @@ void ChunkLeaf::generate_mesh(){
 
     int res = 1 << level;   
     int grid_size = 16;
-    float step = (min_chunk_size/grid_size) * res;
+    float step = (static_cast<float>(min_chunk_size) / grid_size) * res;
+    int vert_count = grid_size + 1;
+
+    vertices.resize(vert_count * vert_count);
+    normals.resize(vert_count * vert_count);
+    uvs.resize(vert_count * vert_count);
+    indices.resize(grid_size * grid_size * 6);
+
     
-    int i = 0;
+    int v_index = 0;
+    for(int x = 0; x < vert_count; x++){
+        for(int y = 0; y < vert_count; y++){
+            Vector2 offset = Vector2(x, y) * step;
+            Vector2 world_coords = pos + offset;
+            
+            double height = tree->get_height(world_coords);
+
+            vertices.set(v_index, Vector3(offset.x, height, offset.y));
+            normals.set(v_index, Vector3(0, 1, 0));
+            uvs.set(v_index, Vector2(static_cast<float>(x) / grid_size, static_cast<float>(y) / grid_size));
+            
+            v_index++;
+        }
+    }
+
+    int i_index = 0;
     for(int x = 0; x < grid_size; x++){
         for(int y = 0; y < grid_size; y++){
-            
-            Vector2 local_coords = pos + Vector2(x,y) * step;
+            int top_left     = (x + 0) * vert_count + (y + 0);
+            int top_right    = (x + 1) * vert_count + (y + 0);
+            int bottom_right = (x + 1) * vert_count + (y + 1);
+            int bottom_left  = (x + 0) * vert_count + (y + 1);
 
-            vertices.push_back(Vector3((x + 0) * step, tree->get_height(local_coords + (Vector2(0,0) * step)), (y + 0) * step)); // create square??
-            vertices.push_back(Vector3((x + 1) * step, tree->get_height(local_coords + (Vector2(1,0) * step)), (y + 0) * step));
-            vertices.push_back(Vector3((x + 1) * step, tree->get_height(local_coords + (Vector2(1,1) * step)), (y + 1) * step));
-            vertices.push_back(Vector3((x + 0) * step, tree->get_height(local_coords + (Vector2(0,1) * step)), (y + 1) * step));
-            
-            normals.push_back(Vector3(0, 1, 0));
-            normals.push_back(Vector3(0, 1, 0));
-            normals.push_back(Vector3(0, 1, 0));
-            normals.push_back(Vector3(0, 1, 0));
+            indices.set(i_index++, top_left);
+            indices.set(i_index++, top_right);
+            indices.set(i_index++, bottom_right);
 
-            uvs.push_back(Vector2(0, 1));
-            uvs.push_back(Vector2(1, 1));
-            uvs.push_back(Vector2(1, 0));
-            uvs.push_back(Vector2(0, 0));
-
-            indices.push_back(i+0);
-            indices.push_back(i+1);
-            indices.push_back(i+2);
-            indices.push_back(i+0);
-            indices.push_back(i+2);
-            indices.push_back(i+3);
-
-            i += 4;
+            indices.set(i_index++, top_left);
+            indices.set(i_index++, bottom_right);
+            indices.set(i_index++, bottom_left);
         }
     }
     

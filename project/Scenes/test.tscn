@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://b68ol5y20w3ss"]
+
+[ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Def_Environment.tres" id="1_lc1oi"]
+[ext_resource type="Texture2D" uid="uid://brkve1pxcsx64" path="res://Scenes/grid.png" id="2_8od7v"]
+[ext_resource type="PackedScene" uid="uid://cx6rd40fopxwq" path="res://Player/tank_controller.tscn" id="3_qc4db"]
+[ext_resource type="PackedScene" uid="uid://bfr3crcaox8lr" path="res://Player/cart.tscn" id="4_ys1qc"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qc4db"]
+albedo_texture = ExtResource("2_8od7v")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_8od7v"]
+material = SubResource("StandardMaterial3D_qc4db")
+size = Vector2(200, 200)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_qc4db"]
+data = PackedVector3Array(100, 0, 100, -100, 0, 100, 100, 0, -100, -100, 0, 100, -100, 0, -100, 100, 0, -100)
+
+[node name="Test" type="Node3D" unique_id=1508038875]
+
+[node name="Env" type="Node3D" parent="." unique_id=1165700550]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Env" unique_id=1788346309]
+environment = ExtResource("1_lc1oi")
+
+[node name="Sun" type="DirectionalLight3D" parent="Env" unique_id=807248815]
+transform = Transform3D(1, 0, 0, 0, -0.5919185, 0.80599785, 0, -0.80599785, -0.5919185, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=1449471531]
+mesh = SubResource("PlaneMesh_8od7v")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Floor" unique_id=1483168407]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D" unique_id=392578669]
+shape = SubResource("ConcavePolygonShape3D_qc4db")
+
+[node name="TankController" parent="." unique_id=841246102 instance=ExtResource("3_qc4db")]
+mouse_sensitivity = 0.05
+
+[node name="Cart" parent="." unique_id=1716809487 node_paths=PackedStringArray("target") instance=ExtResource("4_ys1qc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 4.5363216)
+visible = false
+target = NodePath("../TankController")

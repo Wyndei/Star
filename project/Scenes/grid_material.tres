@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://b8oqfos80kesi"]
+
+[ext_resource type="Texture2D" uid="uid://brkve1pxcsx64" path="res://Scenes/grid.png" id="1_c3qso"]
+
+[resource]
+albedo_texture = ExtResource("1_c3qso")
+uv1_world_triplanar = true
+texture_filter = 0

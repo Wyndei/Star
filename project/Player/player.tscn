@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://bkxm63hr5vu8k"]
+
+[ext_resource type="Script" uid="uid://b1u8v5u750pfr" path="res://Player/player.gd" id="1_3qydi"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_3qydi"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_jqsjm"]
+
+[node name="Player" type="CharacterBody3D" unique_id=1271197914]
+script = ExtResource("1_3qydi")
+mouse_sensitivity = 0.05
+
+[node name="CameraPivot" type="Node3D" parent="." unique_id=219186713]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="CameraArm" type="SpringArm3D" parent="CameraPivot" unique_id=578550581]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+spring_length = 10.0
+
+[node name="CameraBuffer" type="Node3D" parent="CameraPivot/CameraArm" unique_id=1296909613]
+
+[node name="Camera" type="Camera3D" parent="CameraPivot/CameraArm/CameraBuffer" unique_id=2085604582]
+
+[node name="TestMesh" type="MeshInstance3D" parent="." unique_id=657563831]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_3qydi")
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=78701607]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_jqsjm")
+debug_color = Color(0, 0.6, 0.69803923, 0)

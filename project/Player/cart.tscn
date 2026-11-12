@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bfr3crcaox8lr"]
+
+[ext_resource type="Script" uid="uid://nap22ycoovb7" path="res://cart.gd" id="1_r3yhr"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_jqsjm"]
+size = Vector3(2, 0.25, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_u4ds6"]
+size = Vector3(0.25, 1, 1)
+
+[node name="Cart" type="CharacterBody3D" unique_id=1716809487 node_paths=PackedStringArray("pivot")]
+script = ExtResource("1_r3yhr")
+pivot = NodePath("Pivot")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=910137373]
+mesh = SubResource("BoxMesh_jqsjm")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="MeshInstance3D" unique_id=1662863708]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.021, -0.225, 1.3452086)
+mesh = SubResource("BoxMesh_u4ds6")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="MeshInstance3D" unique_id=1918017260]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0213286, -0.22530365, 1.3453977)
+mesh = SubResource("BoxMesh_u4ds6")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="MeshInstance3D" unique_id=296982415]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.021, -0.225, -1.1729999)
+mesh = SubResource("BoxMesh_u4ds6")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="MeshInstance3D" unique_id=1113477236]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0213286, -0.22530365, -1.1728108)
+mesh = SubResource("BoxMesh_u4ds6")
+
+[node name="Pivot" type="Marker3D" parent="." unique_id=8599073]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, -2)
+gizmo_extents = 0.1

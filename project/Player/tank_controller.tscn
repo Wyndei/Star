@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://cx6rd40fopxwq"]
+
+[ext_resource type="Script" uid="uid://c02rweafvmw4" path="res://Player/tank_controller.gd" id="1_0btf2"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_0btf2"]
+size = Vector3(1, 1, 2)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8c1s8"]
+
+[node name="TankController" type="CharacterBody3D" unique_id=841246102]
+script = ExtResource("1_0btf2")
+
+[node name="CameraPivot" type="Node3D" parent="." unique_id=805213422]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="CameraArm" type="SpringArm3D" parent="CameraPivot" unique_id=1775858064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+spring_length = 10.0
+
+[node name="CameraBuffer" type="Node3D" parent="CameraPivot/CameraArm" unique_id=324034100]
+
+[node name="Camera" type="Camera3D" parent="CameraPivot/CameraArm/CameraBuffer" unique_id=209190238]
+
+[node name="TestMesh" type="MeshInstance3D" parent="." unique_id=1425298852]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_0btf2")
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=2102278721]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_8c1s8")
+debug_color = Color(0, 0.6, 0.69803923, 0)

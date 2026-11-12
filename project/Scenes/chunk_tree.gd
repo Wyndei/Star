@@ -12,7 +12,7 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		set_process_mode(Node.PROCESS_MODE_DISABLED)
 		return
-	set_process_mode(Node.PROCESS_MODE_WHEN_PAUSED)
+	set_process_mode(Node.PROCESS_MODE_PAUSABLE)
 	
 	var player_pos : Vector2i = Vector2i(int(floor(player.position.x)),int(floor(player.position.z)))  
 	new_root(Vector2i(player_pos.x,player_pos.y));
@@ -30,8 +30,7 @@ func subdivide_chunks():
 		return
 	player_pos_buffer = Vector2(player.global_position.x,player.global_position.z)
 	
-	var player_pos : Vector2i = Vector2i(int(floor(player.position.x)),int(floor(player.position.z)))
-	chunk_updates(player_pos)
+	update()
 	
 
 func _on_chunk_update_timeout() -> void:

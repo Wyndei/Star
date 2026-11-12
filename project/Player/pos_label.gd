@@ -1,6 +1,6 @@
 extends Label
 
-@export var player : Player
+@export var player : CharacterBody3D
 
 func _process(_delta: float) -> void:
 	text =   "X: " + str(int(floor(player.global_position.x))) + \

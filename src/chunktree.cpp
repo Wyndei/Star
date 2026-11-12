@@ -63,14 +63,7 @@ void ChunkLeaf::_ready(){
 
 void ChunkLeaf::test_visual(){
     WorkerThreadPool* pool = WorkerThreadPool::get_singleton();
-
-    Callable gen_mesh = callable_mp(this, &ChunkLeaf::generate_mesh);
-
-    int64_t task_id = pool->add_task(gen_mesh, false, "mesh_generation");
-
-    pool->wait_for_task_completion(task_id);
-
-
+    
     int hlf_size = get_size()/2;
 
     
@@ -78,6 +71,13 @@ void ChunkLeaf::test_visual(){
     // chunk_thread->start(gen_mesh);
 
     chunk_mesh = memnew(MeshInstance3D); // mesh init
+
+    generate_mesh();
+
+    // Callable gen_mesh = callable_mp(this, &ChunkLeaf::generate_mesh);
+    // int64_t task_id = pool->add_task(gen_mesh, false, "mesh_generation");
+    // pool->wait_for_task_completion(task_id);
+
     chunk_coll = memnew(CollisionShape3D); // collision init
     add_child(chunk_mesh);
     
@@ -155,6 +155,16 @@ void ChunkLeaf::subdivide(){
     bot_left->set_level(new_level);
     bot_right->set_level(new_level);
 
+    top_left->set_subd_dist(subd_dist);
+    top_right->set_subd_dist(subd_dist);
+    bot_left->set_subd_dist(subd_dist);
+    bot_right->set_subd_dist(subd_dist);
+
+    top_left->set_coll_dist(coll_dist);
+    top_right->set_coll_dist(coll_dist);
+    bot_left->set_coll_dist(coll_dist);
+    bot_right->set_coll_dist(coll_dist);
+
     top_left->set_min_chunk_size(min_chunk_size);
     top_right->set_min_chunk_size(min_chunk_size);
     bot_left->set_min_chunk_size(min_chunk_size);
@@ -164,11 +174,6 @@ void ChunkLeaf::subdivide(){
     top_right->set_material(terrain_material);
     bot_left->set_material(terrain_material);
     bot_right->set_material(terrain_material);
-
-    // top_left->set_thread(chunk_thread);
-    // top_right->set_thread(chunk_thread);
-    // bot_left->set_thread(chunk_thread);
-    // bot_right->set_thread(chunk_thread);
 
     add_child(top_left);
     add_child(top_right);
@@ -316,10 +321,10 @@ ChunkTree::~ChunkTree() {
 
 void ChunkTree::_ready(){
 
-    // if (Engine::get_singleton()->is_editor_hint()) {
-    //     set_process_mode(Node::ProcessMode::PROCESS_MODE_DISABLED);
-    //     return;
-    // }
+    if (Engine::get_singleton()->is_editor_hint()) {
+        set_process_mode(Node::ProcessMode::PROCESS_MODE_DISABLED);
+        return;
+    }
     // new_root(Vector2i(0,0));
 }
 
@@ -334,6 +339,10 @@ void ChunkTree::new_root(Vector2i root_pos){
     // set parameters for root to pass to each child leaf
     root->set_pos(root_pos);
     root->set_level(max_level);
+
+    root->set_subd_dist(subd_dist);
+    root->set_coll_dist(coll_dist);
+    
     root->set_min_chunk_size(min_chunk_size);
     root->set_material(terrain_material);
 }

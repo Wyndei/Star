@@ -1,5 +1,5 @@
 extends CharacterBody3D
-class_name Player
+class_name Spectator
 
 @export var walk_speed = 5.0
 @export var run_speed = 50.0

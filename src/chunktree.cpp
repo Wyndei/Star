@@ -99,12 +99,12 @@ void ChunkLeaf::test_visual(){
 
     }
     // chunk tester
-    // test_mesh = memnew(MeshInstance3D); // marker for each chunk
-    // Ref<BoxMesh> new_box_mesh;
-    // new_box_mesh.instantiate();
-    // add_child(test_mesh);
-    // test_mesh->set_mesh(new_box_mesh);
-    // test_mesh->set_position(Vector3(pos.x,0.0,pos.y));
+    test_mesh = memnew(MeshInstance3D); // marker for each chunk
+    Ref<BoxMesh> new_box_mesh;
+    new_box_mesh.instantiate();
+    add_child(test_mesh);
+    test_mesh->set_mesh(new_box_mesh);
+    test_mesh->set_position(Vector3(pos.x,20.0,pos.y));
 }
 
 void ChunkLeaf::chunk_update(Vector2i player_pos){
@@ -145,6 +145,7 @@ void ChunkLeaf::subdivide(){
     // divide leaf into four children
 
     int qtr_size = chunk_size/4;
+    int half_size = chunk_size/2;
 
     // instantiate children
 
@@ -153,10 +154,10 @@ void ChunkLeaf::subdivide(){
     bot_left  = memnew(ChunkLeaf);
     bot_right = memnew(ChunkLeaf);
     
-    top_left->set_pos(pos + Vector2i(-qtr_size, qtr_size));
-    top_right->set_pos(pos + Vector2i(qtr_size, qtr_size));
-    bot_left->set_pos(pos + Vector2i(-qtr_size, -qtr_size));
-    bot_right->set_pos(pos + Vector2i(qtr_size, -qtr_size));
+    top_left->set_pos(pos +  Vector2i(0,         0));
+    top_right->set_pos(pos + Vector2i(half_size, 0));
+    bot_left->set_pos(pos +  Vector2i(0,         half_size));
+    bot_right->set_pos(pos + Vector2i(half_size, half_size));
 
     top_left->set_level(new_level);
     top_right->set_level(new_level);
@@ -174,7 +175,7 @@ void ChunkLeaf::subdivide(){
     add_child(bot_right);
 
     // hide higher level
-    // test_mesh->hide();
+    test_mesh->hide();
     chunk_mesh->hide();
     has_children = true;
     queued = false;
@@ -184,7 +185,7 @@ void ChunkLeaf::collapse(){
     // UtilityFunctions::print("coll");
     // unhide lower subdiv terrain
     chunk_mesh->show();
-    // test_mesh->show();
+    test_mesh->show();
 
     // delete all children
     top_left->queue_free(); 
@@ -289,7 +290,7 @@ void ChunkLeaf::set_coll(Ref<ConcavePolygonShape3D> new_coll){
     chunk_coll->set_shape(new_coll);
 }
 
-int ChunkLeaf::get_size(){return tree->get_min_chunk_size() * pow(2,level);}
+int ChunkLeaf::get_size(){return tree->get_min_chunk_size() * (1 << level);}
 
 bool ChunkLeaf::should_subdivide(Vector2i player_pos){if (player_pos.distance_to(pos) < get_size() * tree->get_subd_dist()) return true; else {return false;};}
 bool ChunkLeaf::should_collapse(Vector2i player_pos){if (player_pos.distance_to(pos) > get_size() * tree->get_coll_dist()) return true; else {return false;};}
@@ -371,8 +372,10 @@ void ChunkTree::new_root(Vector2i root_pos){
         return;
     }
     
+    Vector2 offset = Vector2((min_chunk_size * pow(2,max_level))/2, (min_chunk_size * pow(2,max_level))/2);
+
     root = memnew(ChunkLeaf);
-    root->set_pos(root_pos);
+    root->set_pos(root_pos - offset);
     root->set_level(max_level);
     root->set_tree(this);
 

@@ -1,0 +1,57 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c6udyhxtc2kgp"]
+
+[ext_resource type="Shader" uid="uid://bi04ad0e0t5bm" path="res://Materials/TerrainShader.gdshader" id="1_yrxjb"]
+
+[sub_resource type="Gradient" id="Gradient_lqs38"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(0.14, 0.08435, 0.0658, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_j5bjk"]
+gradient = SubResource("Gradient_lqs38")
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_q80tj"]
+gradient = SubResource("Gradient_lqs38")
+
+[sub_resource type="Gradient" id="Gradient_8e14y"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(0.25, 0.228, 0.03, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_m2ecm"]
+gradient = SubResource("Gradient_8e14y")
+
+[sub_resource type="Gradient" id="Gradient_f5tg7"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(0.538677, 0.404107, 0.0744585, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ajiel"]
+gradient = SubResource("Gradient_f5tg7")
+
+[sub_resource type="Gradient" id="Gradient_d4fat"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(0.137255, 0.0823529, 0.0823529, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_u5nhm"]
+gradient = SubResource("Gradient_d4fat")
+
+[resource]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("1_yrxjb")
+shader_parameter/chunk_uv_scale = 0.0
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/heat_value = 0.0
+shader_parameter/wet_value = 0.0
+shader_parameter/snow_texture = SubResource("GradientTexture1D_m2ecm")
+shader_parameter/grass_texture = SubResource("GradientTexture1D_m2ecm")
+shader_parameter/sand_texture = SubResource("GradientTexture1D_ajiel")
+shader_parameter/snow_cliff_texture = SubResource("GradientTexture1D_u5nhm")
+shader_parameter/cliff_texture = SubResource("GradientTexture1D_j5bjk")
+shader_parameter/dirt_texture = SubResource("GradientTexture1D_q80tj")
+shader_parameter/heat_color = Color(0.968627, 0, 0.0156863, 1)
+shader_parameter/cold_color = Color(0, 0.47451, 1, 1)
+shader_parameter/wet_color = Color(0.168627, 1, 0, 1)
+shader_parameter/dry_color = Color(1, 0.815686, 0, 1)
+shader_parameter/angle = 0.5
+shader_parameter/radius = 0.5
+shader_parameter/freq = 25.0
+shader_parameter/AO_intensity = 1.0

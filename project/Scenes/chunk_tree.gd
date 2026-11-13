@@ -14,13 +14,15 @@ func _ready() -> void:
 		return
 	set_process_mode(Node.PROCESS_MODE_PAUSABLE)
 	
-	var seed : int = randi()
-	noise.seed = seed
-	mountain_noise.seed = seed
+	var world_seed : int = randi()
+	noise.seed = world_seed
+	mountain_noise.seed = world_seed
 	
-	var player_pos : Vector2i = Vector2i(int(floor(player.position.x)),int(floor(player.position.z)))  
+	var player_pos : Vector2i = Vector2i(int(floor(player.position.x)),int(floor(player.position.z))) 
 	new_root(Vector2i(player_pos.x,player_pos.y));
 	update()
+	
+	player.global_position.y = get_height(player_pos) + 1.0
 	
 	#chunk_update_timer.start()
 	

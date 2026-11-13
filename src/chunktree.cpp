@@ -216,6 +216,10 @@ void ChunkLeaf::generate_mesh(){
     float step = (static_cast<float>(min_chunk_size) / grid_size) * res;
     int vert_count = grid_size + 1;
 
+    // if (res == 1){
+    //     UtilityFunctions::print(step);
+    // }
+
     vertices.resize(vert_count * vert_count);
     normals.resize(vert_count * vert_count);
     uvs.resize(vert_count * vert_count);
@@ -225,16 +229,18 @@ void ChunkLeaf::generate_mesh(){
     int v_index = 0;
     for(int x = 0; x < vert_count; x++){
         for(int y = 0; y < vert_count; y++){
-            Vector2 offset = Vector2(x, y) * step;
-            Vector2 world_coords = pos + offset;
-            
+            Vector2 offset = Vector2(static_cast<float>(x) * step, static_cast<float>(y) * step);
+            Vector2 world_coords = offset + pos;
+            // if (res <= 2){
+            //     //  UtilityFunctions::print(offset);
+            //      UtilityFunctions::print(world_coords);
+            // }
             double height = tree->get_height(world_coords);
 
             vertices.set(v_index, Vector3(offset.x, height, offset.y));
 
-            float epsilon = 0.01;
-            Vector2 gradient = tree->get_gradient(world_coords, epsilon);
-            Vector3 normal = Vector3(gradient.x, 2.0 * 0.01, gradient.y).normalized();
+            Vector2 gradient = tree->get_gradient(world_coords, step);
+            Vector3 normal = Vector3(gradient.x, 0.025 , gradient.y).normalized();
 
             normals.set(v_index, normal);
             uvs.set(v_index, Vector2(static_cast<float>(x) / grid_size, static_cast<float>(y) / grid_size));
@@ -325,6 +331,9 @@ void ChunkTree::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("chunk_updates","player_pos"), &ChunkTree::chunk_updates);
 
+    ClassDB::bind_method(D_METHOD("get_height"), &ChunkTree::get_height);
+    ClassDB::bind_method(D_METHOD("get_gradient"), &ChunkTree::get_gradient);
+    
     ADD_PROPERTY(PropertyInfo(Variant::INT, "max_level"), "set_max_level", "get_max_level");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "min_chunk_size"), "set_min_chunk_size", "get_min_chunk_size");
     
@@ -353,26 +362,34 @@ void ChunkTree::_ready(){
 }
 
 void ChunkTree::_process(double delta){
+
     if (divq.empty()){
         // UtilityFunctions::print("empty");
         return;
     }
-    DivLeaf queue_leaf = divq.front();
-    ChunkLeaf* leaf = queue_leaf.leaf;
+    std::shared_ptr<DivLeaf> queue_leaf = divq.front();
+
+    if (queue_leaf == nullptr){
+        divq.pop();
+        return;
+    }
+    
+    ChunkLeaf* leaf = queue_leaf->leaf;
     // UtilityFunctions::print(queue_leaf.leaf->get_pos());
 
-    if (queue_leaf.subd == 0){
+    if (queue_leaf->subd == 0){
         leaf->collapse();
     }
     else{
         leaf->subdivide();
 
         if (leaf->get_level() > 0){
-            leaf->update_children(queue_leaf.player_pos);
+            leaf->update_children(queue_leaf->player_pos);
         }
     }
 
     divq.pop();
+    
 }
 
 void ChunkTree::new_root(Vector2i root_pos){
@@ -390,28 +407,25 @@ void ChunkTree::new_root(Vector2i root_pos){
     add_child(root);
     
     // set parameters for root to pass to each child leaf
-    
-
-    
+        
 }
 
 void ChunkTree::free_root(){
-
 }
 
 void ChunkTree::add_to_queue(ChunkLeaf* new_leaf, bool subd, Vector2i player_pos){
-    DivLeaf new_div_leaf;
-    new_div_leaf.leaf = new_leaf;
-    new_div_leaf.subd = subd;
-    new_div_leaf.player_pos = player_pos;
+    std::shared_ptr<DivLeaf> new_div_leaf = std::make_shared<DivLeaf>();
+    new_div_leaf->leaf = new_leaf;
+    new_div_leaf->subd = subd;
+    new_div_leaf->player_pos = player_pos;
 
     divq.push(new_div_leaf);
 }
 
-double ChunkTree::get_height(Vector2 coord){
-    double height = 0;
-    double n_h = noise->get_noise_2d(coord.x, coord.y) * 30.0;
-    double m_h = mountain_noise->get_noise_2d(coord.x, coord.y) * 20.0;
+float ChunkTree::get_height(Vector2 coord){
+    float height = 0;
+    float n_h = noise->get_noise_2dv(coord) * 30.0;
+    float m_h = mountain_noise->get_noise_2dv(coord) * 20.0;
     m_h *= m_h;
 
     height = n_h + m_h;

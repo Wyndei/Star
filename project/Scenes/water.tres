@@ -2,7 +2,21 @@
 
 [ext_resource type="Shader" uid="uid://vbiripjx44a5" path="res://Scenes/water.gdshader" id="1_qgut1"]
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_5v1tr"]
+frequency = 0.175
+fractal_octaves = 1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fo5ed"]
+noise = SubResource("FastNoiseLite_5v1tr")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_0fj1v"]
+fractal_octaves = 1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_5ukr8"]
+noise = SubResource("FastNoiseLite_0fj1v")
+
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_wdxpl"]
+fractal_octaves = 1
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_lnffu"]
 noise = SubResource("FastNoiseLite_wdxpl")
@@ -15,12 +29,25 @@ noise_type = 2
 noise = SubResource("FastNoiseLite_8lp5r")
 seamless = true
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_k7acu"]
+frequency = 0.03
+fractal_octaves = 1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_o06y3"]
+noise = SubResource("FastNoiseLite_k7acu")
+
 [resource]
 render_priority = 0
 shader = ExtResource("1_qgut1")
 shader_parameter/depth_intensity = 0.0499999988824
+shader_parameter/turbidity = 0.7
+shader_parameter/max_turbidity = 0.95
 shader_parameter/color_shallow = Color(0.2275, 0.5302916, 0.65, 1)
 shader_parameter/color_deep = Color(0.117999986, 0.354, 0.59, 1)
 shader_parameter/color_foam = Color(0.7176, 0.92, 0.90313333, 1)
+shader_parameter/edgeNoise = SubResource("NoiseTexture2D_fo5ed")
+shader_parameter/edgeNoise2 = SubResource("NoiseTexture2D_5ukr8")
 shader_parameter/foamNoise = SubResource("NoiseTexture2D_lnffu")
 shader_parameter/foamNoise2 = SubResource("NoiseTexture2D_qgut1")
+shader_parameter/foamNoiseDisplace = SubResource("NoiseTexture2D_o06y3")
+shader_parameter/wave_speed = 0.75

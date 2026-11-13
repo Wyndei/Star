@@ -19,7 +19,7 @@ void vertex() {
 void fragment() {
 	
 	float sand_height = clamp(height,0.0,1.0);
-	float cliff_normal = clamp(pow(normal.y,0.25),0.0,1.0);
+	float cliff_normal = clamp(pow(normal.y,0.5),0.0,1.0);
 	
 	vec3 floor_color = mix(sand_color, grass_color, sand_height);
 	vec3 final_color = mix(cliff_color, floor_color, cliff_normal);

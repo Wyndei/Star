@@ -125,7 +125,7 @@ class ChunkTree : public QuadTree {
     private:
 
         ChunkLeaf *root;
-        std::queue<DivLeaf> divq;
+        std::queue<std::shared_ptr<DivLeaf>> divq;
 
         int max_level = 8;
         int min_chunk_size = 8; // in meters
@@ -177,7 +177,7 @@ class ChunkTree : public QuadTree {
         void set_mountain_noise(const Ref<FastNoiseLite> &new_noise){mountain_noise = new_noise;}
         Ref<FastNoiseLite> get_mountain_noise(){return mountain_noise;}
 
-        double get_height(Vector2 coord);
+        float get_height(Vector2 coord);
         Vector2 get_gradient(Vector2 coord, float epsilon);
 };
 

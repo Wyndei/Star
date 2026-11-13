@@ -240,7 +240,7 @@ void ChunkLeaf::generate_mesh(){
             vertices.set(v_index, Vector3(offset.x, height, offset.y));
 
             Vector2 gradient = tree->get_gradient(world_coords, step);
-            Vector3 normal = Vector3(gradient.x, 0.025 , gradient.y).normalized();
+            Vector3 normal = Vector3(gradient.x, 2.0 * 0.01 , gradient.y).normalized();
 
             normals.set(v_index, normal);
             uvs.set(v_index, Vector2(static_cast<float>(x) / grid_size, static_cast<float>(y) / grid_size));

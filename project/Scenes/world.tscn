@@ -1,21 +1,32 @@
 [gd_scene format=3 uid="uid://ui7fpeuau5xv"]
 
 [ext_resource type="Script" uid="uid://cqmaginlmrvk5" path="res://Scenes/chunk_tree.gd" id="1_5a7ea"]
-[ext_resource type="Material" uid="uid://biro3ukjcx06a" path="res://Scenes/terrain_shader.tres" id="1_8j60k"]
+[ext_resource type="Material" uid="uid://cpgh4cd8jo28j" path="res://Scenes/terrain.tres" id="1_fo5ed"]
 [ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Def_Environment.tres" id="2_5a7ea"]
 [ext_resource type="PackedScene" uid="uid://dyxoxdvt6jpbx" path="res://Player/spectator.tscn" id="4_8j60k"]
+[ext_resource type="Material" uid="uid://b35jmym2v7yfi" path="res://Scenes/water.tres" id="4_fo5ed"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_766gb"]
+frequency = 0.005
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_fo5ed"]
+frequency = 0.0001
+fractal_type = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jqsjm"]
+material = ExtResource("4_fo5ed")
+size = Vector2(3840, 3840)
 
 [node name="World" type="Node3D" unique_id=518074697]
 
 [node name="ChunkTree" type="ChunkTree" parent="." unique_id=2028939604 node_paths=PackedStringArray("player")]
 min_chunk_size = 16
-material = ExtResource("1_8j60k")
+material = ExtResource("1_fo5ed")
 noise = SubResource("FastNoiseLite_766gb")
+mountain_noise = SubResource("FastNoiseLite_fo5ed")
 process_mode = 4
 script = ExtResource("1_5a7ea")
-player = NodePath("../Test")
+player = NodePath("../Spectator")
 
 [node name="ChunkUpdate" type="Timer" parent="ChunkTree" unique_id=2025554172]
 process_mode = 1
@@ -29,6 +40,9 @@ environment = ExtResource("2_5a7ea")
 [node name="Sun" type="DirectionalLight3D" parent="Env" unique_id=2140317250]
 transform = Transform3D(1, 0, 0, 0, -0.5919185, 0.80599785, 0, -0.80599785, -0.5919185, 0, 0, 0)
 shadow_enabled = true
+
+[node name="Water" type="MeshInstance3D" parent="Env" unique_id=1612351103]
+mesh = SubResource("PlaneMesh_jqsjm")
 
 [node name="Spectator" parent="." unique_id=762592508 instance=ExtResource("4_8j60k")]
 

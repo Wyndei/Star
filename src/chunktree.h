@@ -133,6 +133,7 @@ class ChunkTree : public QuadTree {
         int coll_dist = 6;
 
         Ref<FastNoiseLite> noise;
+        Ref<FastNoiseLite> mountain_noise;
         Ref<Material> terrain_material;
         // (largest_chunk_size = smallest_chunk_size * highest_level) in meters
 
@@ -173,8 +174,11 @@ class ChunkTree : public QuadTree {
 
         void set_noise(const Ref<FastNoiseLite> &new_noise){noise = new_noise;}
         Ref<FastNoiseLite> get_noise(){return noise;}
+        void set_mountain_noise(const Ref<FastNoiseLite> &new_noise){mountain_noise = new_noise;}
+        Ref<FastNoiseLite> get_mountain_noise(){return mountain_noise;}
 
         double get_height(Vector2 coord);
+        Vector2 get_gradient(Vector2 coord, float epsilon);
 };
 
 

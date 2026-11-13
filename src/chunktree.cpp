@@ -66,7 +66,6 @@ void ChunkLeaf::test_visual(){
     int hlf_size = get_size()/2;
 
     
-    
     // chunk_thread->start(gen_mesh);
 
     chunk_mesh = memnew(MeshInstance3D); // mesh init
@@ -80,7 +79,7 @@ void ChunkLeaf::test_visual(){
     chunk_coll = memnew(CollisionShape3D); // collision init
     add_child(chunk_mesh);
     
-    chunk_mesh->set_position(Vector3(pos.x-hlf_size, 0.0, pos.y-hlf_size));
+    chunk_mesh->set_position(Vector3(pos.x, 0.0, pos.y));
     chunk_mesh->set_material_override(tree->get_material());
 
 
@@ -94,17 +93,17 @@ void ChunkLeaf::test_visual(){
         add_child(chunk_body);
 
         chunk_body->add_child(chunk_coll);
-        chunk_coll->set_position(Vector3(pos.x-hlf_size, 0.0, pos.y-hlf_size));
+        chunk_coll->set_position(Vector3(pos.x, 0.0, pos.y));
         // chunk_coll->set_shape(generate_collision());
 
     }
     // chunk tester
-    test_mesh = memnew(MeshInstance3D); // marker for each chunk
-    Ref<BoxMesh> new_box_mesh;
-    new_box_mesh.instantiate();
-    add_child(test_mesh);
-    test_mesh->set_mesh(new_box_mesh);
-    test_mesh->set_position(Vector3(pos.x,20.0,pos.y));
+    // test_mesh = memnew(MeshInstance3D); // marker for each chunk
+    // Ref<BoxMesh> new_box_mesh;
+    // new_box_mesh.instantiate();
+    // add_child(test_mesh);
+    // test_mesh->set_mesh(new_box_mesh);
+    // test_mesh->set_position(Vector3(pos.x,tree->get_height(Vector2(pos.x, pos.y)),pos.y));
 }
 
 void ChunkLeaf::chunk_update(Vector2i player_pos){
@@ -175,7 +174,7 @@ void ChunkLeaf::subdivide(){
     add_child(bot_right);
 
     // hide higher level
-    test_mesh->hide();
+    // test_mesh->hide();
     chunk_mesh->hide();
     has_children = true;
     queued = false;
@@ -185,7 +184,7 @@ void ChunkLeaf::collapse(){
     // UtilityFunctions::print("coll");
     // unhide lower subdiv terrain
     chunk_mesh->show();
-    test_mesh->show();
+    // test_mesh->show();
 
     // delete all children
     top_left->queue_free(); 
@@ -232,7 +231,12 @@ void ChunkLeaf::generate_mesh(){
             double height = tree->get_height(world_coords);
 
             vertices.set(v_index, Vector3(offset.x, height, offset.y));
-            normals.set(v_index, Vector3(0, 1, 0));
+
+            float epsilon = 0.01;
+            Vector2 gradient = tree->get_gradient(world_coords, epsilon);
+            Vector3 normal = Vector3(gradient.x, 2.0 * 0.01, gradient.y).normalized();
+
+            normals.set(v_index, normal);
             uvs.set(v_index, Vector2(static_cast<float>(x) / grid_size, static_cast<float>(y) / grid_size));
             
             v_index++;
@@ -316,6 +320,8 @@ void ChunkTree::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("set_noise", "new_noise"), &ChunkTree::set_noise);
     ClassDB::bind_method(D_METHOD("get_noise"), &ChunkTree::get_noise);
+    ClassDB::bind_method(D_METHOD("set_mountain_noise", "new_noise"), &ChunkTree::set_mountain_noise);
+    ClassDB::bind_method(D_METHOD("get_mountain_noise"), &ChunkTree::get_mountain_noise);
 
     ClassDB::bind_method(D_METHOD("chunk_updates","player_pos"), &ChunkTree::chunk_updates);
 
@@ -326,7 +332,9 @@ void ChunkTree::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::INT, "coll_dist"), "set_coll_dist", "get_coll_dist");
     
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material", "get_material");
+
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "noise", PROPERTY_HINT_RESOURCE_TYPE, "FastNoiseLite"), "set_noise", "get_noise");
+    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "mountain_noise", PROPERTY_HINT_RESOURCE_TYPE, "FastNoiseLite"), "set_mountain_noise", "get_mountain_noise");
 }
 
 ChunkTree::ChunkTree() {
@@ -401,6 +409,18 @@ void ChunkTree::add_to_queue(ChunkLeaf* new_leaf, bool subd, Vector2i player_pos
 }
 
 double ChunkTree::get_height(Vector2 coord){
-    return noise->get_noise_2d(coord.x, coord.y) * 20.0;
+    double height = 0;
+    double n_h = noise->get_noise_2d(coord.x, coord.y) * 30.0;
+    double m_h = mountain_noise->get_noise_2d(coord.x, coord.y) * 20.0;
+    m_h *= m_h;
+
+    height = n_h + m_h;
+
+    return height;
 }
 
+Vector2 ChunkTree::get_gradient(Vector2 coord, float epsilon){ // I want to implement an analytical derivative later but this will do for now
+    float dx = get_height(Vector2(coord.x - epsilon, coord.y)) - get_height(Vector2(coord.x + epsilon, coord.y));
+	float dy = get_height(Vector2(coord.x, coord.y - epsilon)) - get_height(Vector2(coord.x, coord.y + epsilon));
+	return Vector2(dx, dy) / (2.0 * epsilon);
+}

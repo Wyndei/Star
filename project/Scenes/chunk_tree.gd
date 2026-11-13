@@ -14,6 +14,10 @@ func _ready() -> void:
 		return
 	set_process_mode(Node.PROCESS_MODE_PAUSABLE)
 	
+	var seed : int = randi()
+	noise.seed = seed
+	mountain_noise.seed = seed
+	
 	var player_pos : Vector2i = Vector2i(int(floor(player.position.x)),int(floor(player.position.z)))  
 	new_root(Vector2i(player_pos.x,player_pos.y));
 	update()

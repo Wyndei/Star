@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cpgh4cd8jo28j"]
+
+[ext_resource type="Shader" uid="uid://c0ay6dt5xl7un" path="res://Scenes/terrain.gdshader" id="1_qy8jg"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_qy8jg")
+shader_parameter/grass_color = Color(0.36514997, 0.67, 0.23450002, 1)
+shader_parameter/sand_color = Color(0.77, 0.7161, 0.44660002, 1)
+shader_parameter/cliff_color = Color(0.39175236, 0.43274525, 0.47923714, 1)

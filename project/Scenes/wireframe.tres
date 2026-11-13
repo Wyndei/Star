@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://biro3ukjcx06a"]
 
-[ext_resource type="Shader" uid="uid://oythdbufhy1k" path="res://Scenes/terrain_shader.gdshader" id="1_j7w7v"]
+[ext_resource type="Shader" uid="uid://oythdbufhy1k" path="res://Scenes/wireframe.gdshader" id="1_j7w7v"]
 
 [resource]
 render_priority = 0

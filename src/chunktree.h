@@ -25,6 +25,9 @@
 #include <godot_cpp/classes/box_mesh.hpp>
 #include <godot_cpp/classes/array_mesh.hpp>
 
+#include <godot_cpp/classes/multi_mesh_instance3d.hpp>
+#include <godot_cpp/classes/multi_mesh.hpp>
+
 #include <godot_cpp/classes/static_body3d.hpp>
 #include <godot_cpp/classes/collision_shape3d.hpp>
 #include <godot_cpp/classes/concave_polygon_shape3d.hpp>
@@ -37,6 +40,7 @@
 
 #include <godot_cpp/variant/callable.hpp>
 #include <godot_cpp/variant/callable_method_pointer.hpp>
+
 
 #include <godot_cpp/classes/fast_noise_lite.hpp>
 
@@ -64,6 +68,9 @@ class ChunkLeaf : public Leaf{
         MeshInstance3D *chunk_mesh;
         StaticBody3D *chunk_body;
         CollisionShape3D *chunk_coll;
+
+        std::vector<Ref<MultiMesh>> mm;
+        std::vector<MultiMeshInstance3D *> mmi; 
 
         ChunkLeaf *top_left;
         ChunkLeaf *top_right;
@@ -109,7 +116,8 @@ class ChunkLeaf : public Leaf{
     void subdivide();
     void collapse();
 
-    void test_visual();
+    void generate_visual();
+    void generate_objects();
 };
 
 

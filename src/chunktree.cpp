@@ -6,34 +6,35 @@ using namespace godot;
 
 
 void ChunkLeaf::_bind_methods() {   
+    // setters/getters
     ClassDB::bind_method(D_METHOD("set_pos", "new_pos"), &ChunkLeaf::set_pos);
     ClassDB::bind_method(D_METHOD("get_pos"), &ChunkLeaf::get_pos);
     ClassDB::bind_method(D_METHOD("get_size"), &ChunkLeaf::get_size);
     ClassDB::bind_method(D_METHOD("set_level, new_level"), &ChunkLeaf::get_level);
     ClassDB::bind_method(D_METHOD("get_level"), &ChunkLeaf::get_level);
-
     ClassDB::bind_method(D_METHOD("set_tree, new_tree"), &ChunkLeaf::set_tree);
     ClassDB::bind_method(D_METHOD("get_tree"), &ChunkLeaf::get_tree);
-
-
-    ClassDB::bind_method(D_METHOD("chunk_update", "player_pos"), &ChunkLeaf::chunk_update);
     
+    // visuals
+    ClassDB::bind_method(D_METHOD("generate_visual"), &ChunkLeaf::generate_visual);
+    ClassDB::bind_method(D_METHOD("generate_objects"), &ChunkLeaf::generate_objects);
     ClassDB::bind_method(D_METHOD("generate_mesh"), &ChunkLeaf::generate_mesh);
-    ClassDB::bind_method(D_METHOD("generate_collision"), &ChunkLeaf::generate_collision);
-    
     ClassDB::bind_method(D_METHOD("set_mesh", "surface_array"), &ChunkLeaf::set_mesh);
+
+    // collisions
+    ClassDB::bind_method(D_METHOD("generate_collision"), &ChunkLeaf::generate_collision);
     ClassDB::bind_method(D_METHOD("set_coll", "new_coll"), &ChunkLeaf::set_coll);
 
+    // subd methods
+    ClassDB::bind_method(D_METHOD("chunk_update", "player_pos"), &ChunkLeaf::chunk_update);
     ClassDB::bind_method(D_METHOD("add_to_queue", "subd"), &ChunkLeaf::add_to_queue);
     ClassDB::bind_method(D_METHOD("subdivide"), &ChunkLeaf::subdivide);
     ClassDB::bind_method(D_METHOD("collapse"), &ChunkLeaf::collapse);
-    
-
     ClassDB::bind_method(D_METHOD("should_subdivide", "player_pos"), &ChunkLeaf::should_subdivide);
     ClassDB::bind_method(D_METHOD("should_collapse", "player_pos"), &ChunkLeaf::should_collapse);
 
 
-    ClassDB::bind_method(D_METHOD("test_visual"), &ChunkLeaf::test_visual);
+    
 }
 
 ChunkLeaf::ChunkLeaf() {
@@ -57,30 +58,35 @@ ChunkLeaf::~ChunkLeaf() {
 
 void ChunkLeaf::_ready(){
     // UtilityFunctions::print(pos);
-    test_visual();
+    generate_visual();
 }
 
-void ChunkLeaf::test_visual(){
+void ChunkLeaf::generate_visual(){
     WorkerThreadPool* pool = WorkerThreadPool::get_singleton();
     
     int hlf_size = get_size()/2;
 
-    
     // chunk_thread->start(gen_mesh);
 
     chunk_mesh = memnew(MeshInstance3D); // mesh init
+    chunk_coll = memnew(CollisionShape3D); // collision init
 
     generate_mesh();
+
+    mm.resize(1);
+    mmi.resize(1);
+    generate_objects();
 
     // Callable gen_mesh = callable_mp(this, &ChunkLeaf::generate_mesh);
     // int64_t task_id = pool->add_task(gen_mesh, false, "mesh_generation");
     // pool->wait_for_task_completion(task_id);
 
-    chunk_coll = memnew(CollisionShape3D); // collision init
+    
     add_child(chunk_mesh);
     
     chunk_mesh->set_position(Vector3(pos.x, 0.0, pos.y));
     chunk_mesh->set_material_override(tree->get_material());
+
 
 
     if (Engine::get_singleton()->is_editor_hint()) {
@@ -97,6 +103,7 @@ void ChunkLeaf::test_visual(){
         // chunk_coll->set_shape(generate_collision());
 
     }
+   
     // chunk tester
     // test_mesh = memnew(MeshInstance3D); // marker for each chunk
     // Ref<BoxMesh> new_box_mesh;
@@ -196,8 +203,50 @@ void ChunkLeaf::collapse(){
     top_right = nullptr;
     bot_left = nullptr;
     bot_right = nullptr;
+
     has_children = false;
     queued = false;
+
+}
+
+void ChunkLeaf::generate_objects(){
+    if (level > 5) return;
+
+    Ref<BoxMesh> box_mesh;
+    box_mesh.instantiate();
+
+    PackedVector3Array positions;
+
+    mm[0].instantiate();
+
+    int i = 0;
+    for (int x = 0; x < get_size(); x++){
+        for (int y = 0; y < get_size(); y++){
+            float r = UtilityFunctions::randi_range(0,100);
+
+            if (r > 90){
+                Vector3 obj_pos = Vector3(x, tree->get_height(Vector2(x+pos.x,y+pos.y)),y);
+                positions.push_back(obj_pos);
+                i++;
+            }
+        }
+    }
+
+    mm[0]->set_transform_format(MultiMesh::TRANSFORM_3D);
+    mm[0]->set_instance_count(i);
+
+    for (int x = 0; x < i; x++){
+        Transform3D xform = Transform3D(Basis(), positions[x]);
+        mm[0]->set_instance_transform(x, xform);
+    }
+
+    mm[0]->set_mesh(box_mesh);
+    
+    
+    mmi[0] = memnew(MultiMeshInstance3D);
+    mmi[0]->set_multimesh(mm[0]);
+    chunk_mesh->add_child(mmi[0]);
+    // mmi[0]->set_position(Vector3(pos.x, 0.0, pos.y));
 
 }
 
@@ -240,7 +289,7 @@ void ChunkLeaf::generate_mesh(){
             vertices.set(v_index, Vector3(offset.x, height, offset.y));
 
             Vector2 gradient = tree->get_gradient(world_coords, step);
-            Vector3 normal = Vector3(gradient.x, 2.0 * 0.01 , gradient.y).normalized();
+            Vector3 normal = Vector3(gradient.x, 1.0 , gradient.y).normalized();
 
             normals.set(v_index, normal);
             uvs.set(v_index, Vector2(static_cast<float>(x) / grid_size, static_cast<float>(y) / grid_size));

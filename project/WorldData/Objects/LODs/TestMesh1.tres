@@ -1,0 +1,18 @@
+[gd_resource type="LODMesh" format=3 uid="uid://s2cnkadt0mr0"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hvmfv"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_c7qh4"]
+material = SubResource("StandardMaterial3D_hvmfv")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_di00v"]
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_nxoba"]
+material = SubResource("StandardMaterial3D_di00v")
+size = Vector2(1.5, 1.5)
+
+[resource]
+LOD0 = SubResource("BoxMesh_c7qh4")
+LOD1 = SubResource("QuadMesh_nxoba")
+LOD2 = SubResource("QuadMesh_nxoba")

@@ -1,0 +1,20 @@
+[gd_resource type="LODMesh" format=3 uid="uid://6on7jm7cw3lw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wtuej"]
+albedo_color = Color(1, 0.4745098, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_japn2"]
+material = SubResource("StandardMaterial3D_wtuej")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jx560"]
+albedo_color = Color(1, 0.4745098, 1, 1)
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_gg6yl"]
+material = SubResource("StandardMaterial3D_jx560")
+size = Vector2(1.5, 1.5)
+
+[resource]
+LOD0 = SubResource("BoxMesh_japn2")
+LOD1 = SubResource("QuadMesh_gg6yl")
+LOD2 = SubResource("QuadMesh_gg6yl")

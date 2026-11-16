@@ -20,6 +20,11 @@ void initialize_example_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_CLASS(QuadTree);
 	GDREGISTER_CLASS(ChunkLeaf);
 	GDREGISTER_CLASS(ChunkTree);
+
+	GDREGISTER_CLASS(Biome);
+	GDREGISTER_CLASS(LODMesh);
+	GDREGISTER_CLASS(ENVObj);
+	
 	// ClassDB::register_class<GDExample>(); 
 
 }

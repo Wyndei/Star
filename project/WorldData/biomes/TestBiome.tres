@@ -1,0 +1,8 @@
+[gd_resource type="Biome" format=3 uid="uid://rdoor2frdeba"]
+
+[ext_resource type="ENVObj" uid="uid://bb5yxqtj5aog2" path="res://WorldData/Objects/TestObj1.tres" id="1_3ysja"]
+[ext_resource type="ENVObj" uid="uid://wtbewynvq2rv" path="res://WorldData/Objects/TestObj2.tres" id="2_wc2r2"]
+
+[resource]
+biome_name = "TestBiome"
+env_objects = Array[ENVObj]([ExtResource("1_3ysja"), ExtResource("2_wc2r2")])

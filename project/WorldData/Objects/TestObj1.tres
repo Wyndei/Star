@@ -1,0 +1,7 @@
+[gd_resource type="ENVObj" format=3 uid="uid://bb5yxqtj5aog2"]
+
+[ext_resource type="LODMesh" uid="uid://s2cnkadt0mr0" path="res://WorldData/Objects/LODs/TestMesh1.tres" id="1_p76cy"]
+
+[resource]
+lod_mesh = ExtResource("1_p76cy")
+weight = 30

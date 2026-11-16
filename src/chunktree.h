@@ -1,8 +1,10 @@
 #pragma once
 
-#include <queue>
 
 #include "quadtree.h"
+#include "genobj.h"
+
+#include <queue>
 
 #include <godot_cpp/core/binder_common.hpp>
 
@@ -10,8 +12,10 @@
 
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/engine.hpp>
+
 #include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/classes/scene_tree_timer.hpp>
+#include <godot_cpp/classes/random_number_generator.hpp>
 
 #include <godot_cpp/variant/vector3.hpp>
 #include <godot_cpp/variant/vector2.hpp>
@@ -49,6 +53,9 @@ namespace godot {
 class ChunkLeaf;
 class ChunkTree;
 struct DivLeaf;
+
+
+
 
 class ChunkLeaf : public Leaf{
     GDCLASS(ChunkLeaf, Leaf)
@@ -118,6 +125,8 @@ class ChunkLeaf : public Leaf{
 
     void generate_visual();
     void generate_objects();
+
+    int get_object_index(TypedArray<Ref<ENVObj>> env_objects, Vector2 pos);
 };
 
 
@@ -135,6 +144,8 @@ class ChunkTree : public QuadTree {
         ChunkLeaf *root;
         std::queue<std::shared_ptr<DivLeaf>> divq;
 
+        int world_seed = 0;
+
         int max_level = 8;
         int min_chunk_size = 8; // in meters
         int subd_dist = 4;
@@ -145,6 +156,7 @@ class ChunkTree : public QuadTree {
         Ref<Material> terrain_material;
         // (largest_chunk_size = smallest_chunk_size * highest_level) in meters
 
+        Ref<Biome> biome; // test
 
 
     protected:
@@ -185,8 +197,14 @@ class ChunkTree : public QuadTree {
         void set_mountain_noise(const Ref<FastNoiseLite> &new_noise){mountain_noise = new_noise;}
         Ref<FastNoiseLite> get_mountain_noise(){return mountain_noise;}
 
+        void set_biome(const Ref<Biome> &new_biome){biome = new_biome;}
+        Ref<Biome> get_biome(){return biome;}
+
         float get_height(Vector2 coord);
         Vector2 get_gradient(Vector2 coord, float epsilon);
+
+        void set_world_seed(const int new_world_seed){world_seed = new_world_seed;}
+        int get_world_seed(){return world_seed;}
 };
 
 

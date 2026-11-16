@@ -1,0 +1,6 @@
+[gd_resource type="ENVObj" format=3 uid="uid://wtbewynvq2rv"]
+
+[ext_resource type="LODMesh" uid="uid://6on7jm7cw3lw" path="res://WorldData/Objects/LODs/TestMesh2.tres" id="1_iqqrd"]
+
+[resource]
+lod_mesh = ExtResource("1_iqqrd")

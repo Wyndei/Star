@@ -1,4 +1,5 @@
 #include "chunktree.h"
+#include "genobj.h"
 #include <godot_cpp/core/class_db.hpp>
 
 
@@ -73,8 +74,6 @@ void ChunkLeaf::generate_visual(){
 
     generate_mesh();
 
-    mm.resize(1);
-    mmi.resize(1);
     generate_objects();
 
     // Callable gen_mesh = callable_mp(this, &ChunkLeaf::generate_mesh);
@@ -210,44 +209,105 @@ void ChunkLeaf::collapse(){
 }
 
 void ChunkLeaf::generate_objects(){
-    if (level > 5) return;
+    if (level > 4) return; // limited to closer chunks
 
-    Ref<BoxMesh> box_mesh;
-    box_mesh.instantiate();
+    Ref<Biome> biome = tree->get_biome();
+    if (biome.is_null() || chunk_mesh == nullptr) {UtilityFunctions::print("Biome is null"); return;}
 
-    PackedVector3Array positions;
+    TypedArray<Ref<ENVObj>> env_objects = biome->get_env_objects();
+    int mm_count = env_objects.size();
+    if (mm_count == 0 ){UtilityFunctions::print("No Objects"); return;}
 
-    mm[0].instantiate();
+    std::vector<std::vector<Vector3>> positions;
+    positions.resize(mm_count);
 
-    int i = 0;
-    for (int x = 0; x < get_size(); x++){
-        for (int y = 0; y < get_size(); y++){
-            float r = UtilityFunctions::randi_range(0,100);
+    // set up multimeshes
+    mm.clear();
+    mm.resize(mm_count);
+    mmi.clear();
+    mmi.resize(mm_count);
 
-            if (r > 90){
-                Vector3 obj_pos = Vector3(x, tree->get_height(Vector2(x+pos.x,y+pos.y)),y);
-                positions.push_back(obj_pos);
-                i++;
+    for (int x = 0; x < mm_count; x++){
+        
+        Ref<ENVObj> object = env_objects[x];
+        if (object.is_null()) {UtilityFunctions::print("object is null"); continue;}
+        Ref<LODMesh> lod_mesh = object->get_lod_mesh();
+        if (lod_mesh.is_null()) {UtilityFunctions::print("LOD is null"); continue;}
+        
+        Ref<Mesh> new_mesh;
+        if (level < 2){
+            new_mesh = lod_mesh->get_LOD0();
+        }
+        else if (level < 4){
+            new_mesh = lod_mesh->get_LOD1();
+        }
+        else{
+            new_mesh = lod_mesh->get_LOD2();
+        }
+
+        if (new_mesh.is_null()){UtilityFunctions::print("New LOD Mesh is null"); continue;}
+
+        mm[x].instantiate();
+        mm[x]->set_transform_format(MultiMesh::TRANSFORM_3D);
+        mm[x]->set_mesh(new_mesh);
+    }
+
+    int size = get_size();
+    for (int x = 0; x < size; x++){
+        for (int y = 0; y < size; y++){
+
+            Vector2 world_pos = Vector2(x+pos.x,y+pos.y);
+            int obj_idx = get_object_index(env_objects, world_pos);
+            
+            if (obj_idx < -1 || obj_idx >= mm_count){UtilityFunctions::print("Object Index is null"); continue;}
+
+            if (obj_idx != -1){ // -1 means no object
+                Vector3 obj_pos = Vector3(x, tree->get_height(world_pos),y);
+                positions[obj_idx].push_back(obj_pos);
             }
         }
     }
 
-    mm[0]->set_transform_format(MultiMesh::TRANSFORM_3D);
-    mm[0]->set_instance_count(i);
+    for (int x = 0; x < mm_count; x++){
+        if (mm[x].is_null()){UtilityFunctions::print("MM is invalid"); continue;}
+        if (positions[x].empty()){continue;} // if positions is empty
 
-    for (int x = 0; x < i; x++){
-        Transform3D xform = Transform3D(Basis(), positions[x]);
-        mm[0]->set_instance_transform(x, xform);
+        mm[x]->set_instance_count(positions[x].size()); // increase instance count by one
+        for (int y = 0; y < positions[x].size(); y++){
+            Transform3D xform = Transform3D(Basis(), positions[x][y]);
+            mm[x]->set_instance_transform(y, xform); // set this instance position
+        }
+
+        mmi[x] = memnew(MultiMeshInstance3D);
+        mmi[x]->set_multimesh(mm[x]);
+        chunk_mesh->add_child(mmi[x]);
+    }
+}
+
+int ChunkLeaf::get_object_index(TypedArray<Ref<ENVObj>> env_objects, Vector2 pos){
+    int index = -1;
+
+    int total_weight = 1000;
+    // for (int x = 0; x < env_objects.size(); x++){
+    //     Ref<ENVObj> cur_obj = env_objects[x];
+    //     total_weight += cur_obj->get_weight();
+    // }
+
+    UtilityFunctions::seed(tree->get_world_seed() + UtilityFunctions::hash(pos)); // seed based on hashed position
+    float r = UtilityFunctions::randi_range(0,total_weight-1); // generate random number
+
+    int cur_weight = 0;
+    for (int x = 0; x < env_objects.size(); x++){
+        Ref<ENVObj> cur_obj = env_objects[x];
+        cur_weight += cur_obj->get_weight();
+        
+        if (r < cur_weight){
+            index = x;
+            break;
+        }
     }
 
-    mm[0]->set_mesh(box_mesh);
-    
-    
-    mmi[0] = memnew(MultiMeshInstance3D);
-    mmi[0]->set_multimesh(mm[0]);
-    chunk_mesh->add_child(mmi[0]);
-    // mmi[0]->set_position(Vector3(pos.x, 0.0, pos.y));
-
+    return index;
 }
 
 void ChunkLeaf::generate_mesh(){
@@ -382,17 +442,28 @@ void ChunkTree::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("get_height"), &ChunkTree::get_height);
     ClassDB::bind_method(D_METHOD("get_gradient"), &ChunkTree::get_gradient);
+
+    ClassDB::bind_method(D_METHOD("set_world_seed", "new_world_seed"), &ChunkTree::set_world_seed);
+    ClassDB::bind_method(D_METHOD("get_world_seed"), &ChunkTree::get_world_seed);
+
     
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "world_seed"), "set_world_seed", "get_world_seed");
+
     ADD_PROPERTY(PropertyInfo(Variant::INT, "max_level"), "set_max_level", "get_max_level");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "min_chunk_size"), "set_min_chunk_size", "get_min_chunk_size");
     
     ADD_PROPERTY(PropertyInfo(Variant::INT, "subd_dist"), "set_subd_dist", "get_subd_dist");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "coll_dist"), "set_coll_dist", "get_coll_dist");
-    
+
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material", "get_material");
 
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "noise", PROPERTY_HINT_RESOURCE_TYPE, "FastNoiseLite"), "set_noise", "get_noise");
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "mountain_noise", PROPERTY_HINT_RESOURCE_TYPE, "FastNoiseLite"), "set_mountain_noise", "get_mountain_noise");
+
+
+    ClassDB::bind_method(D_METHOD("get_biome"), &ChunkTree::get_biome);
+    ClassDB::bind_method(D_METHOD("set_biome"), &ChunkTree::set_biome);
+    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "test_biome", PROPERTY_HINT_RESOURCE_TYPE, "Biome"), "set_biome", "get_biome");
 }
 
 ChunkTree::ChunkTree() {

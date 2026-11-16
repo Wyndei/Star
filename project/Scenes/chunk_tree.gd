@@ -14,7 +14,8 @@ func _ready() -> void:
 		return
 	set_process_mode(Node.PROCESS_MODE_PAUSABLE)
 	
-	var world_seed : int = randi()
+	var new_world_seed : int = randi()
+	set_world_seed(new_world_seed)
 	noise.seed = world_seed
 	mountain_noise.seed = world_seed
 	

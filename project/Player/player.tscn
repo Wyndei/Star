@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://bkxm63hr5vu8k"]
 
 [ext_resource type="Script" uid="uid://b1u8v5u750pfr" path="res://Player/player.gd" id="1_3qydi"]
+[ext_resource type="Script" uid="uid://cublglxfwg6oa" path="res://Player/fps_label.gd" id="2_btcbx"]
+[ext_resource type="Script" uid="uid://c3ejdqb6xvd3d" path="res://Player/pos_label.gd" id="3_gwnis"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_3qydi"]
 
@@ -29,3 +31,20 @@ mesh = SubResource("CapsuleMesh_3qydi")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_jqsjm")
 debug_color = Color(0, 0.6, 0.69803923, 0)
+
+[node name="FPSLabel" type="Label" parent="." unique_id=551299877]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "FPS: 2"
+script = ExtResource("2_btcbx")
+
+[node name="PosLabel" type="Label" parent="." unique_id=1300210370 node_paths=PackedStringArray("player")]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
+text = "X: 2 Y: 3 Z: 4"
+script = ExtResource("3_gwnis")
+player = NodePath("..")

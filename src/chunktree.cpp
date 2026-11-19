@@ -32,10 +32,7 @@ void ChunkLeaf::_bind_methods() {
     ClassDB::bind_method(D_METHOD("subdivide"), &ChunkLeaf::subdivide);
     ClassDB::bind_method(D_METHOD("collapse"), &ChunkLeaf::collapse);
     ClassDB::bind_method(D_METHOD("should_subdivide", "player_pos"), &ChunkLeaf::should_subdivide);
-    ClassDB::bind_method(D_METHOD("should_collapse", "player_pos"), &ChunkLeaf::should_collapse);
-
-
-    
+    ClassDB::bind_method(D_METHOD("should_collapse", "player_pos"), &ChunkLeaf::should_collapse);    
 }
 
 ChunkLeaf::ChunkLeaf() {

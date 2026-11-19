@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://brkve1pxcsx64"
-path="res://.godot/imported/grid.png-660436d651af05c2b7b36278655f6adf.ctex"
+path="res://.godot/imported/grid.png-866839f052c7e61bfbcf400d5787eb31.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scenes/grid.png"
-dest_files=["res://.godot/imported/grid.png-660436d651af05c2b7b36278655f6adf.ctex"]
+source_file="res://Scenes/Materials/grid.png"
+dest_files=["res://.godot/imported/grid.png-866839f052c7e61bfbcf400d5787eb31.ctex"]
 
 [params]
 

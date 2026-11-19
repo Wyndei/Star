@@ -53,7 +53,6 @@ func zoom(amount : int = 0, step : float = 1.0):
 
 
 func _process(delta):
-	
 	if Input.is_action_just_pressed("ShowMouse"):
 		mouse_visible = !mouse_visible
 	

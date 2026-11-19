@@ -5,6 +5,7 @@
 #include "genobj.h"
 
 #include <queue>
+#include <memory>
 
 #include <godot_cpp/core/binder_common.hpp>
 

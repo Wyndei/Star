@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b68ol5y20w3ss"]
 
-[ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Def_Environment.tres" id="1_lc1oi"]
-[ext_resource type="Texture2D" uid="uid://brkve1pxcsx64" path="res://Scenes/grid.png" id="2_8od7v"]
+[ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Environments/Def_Environment.tres" id="1_lc1oi"]
+[ext_resource type="Texture2D" uid="uid://brkve1pxcsx64" path="res://Scenes/Materials/grid.png" id="2_8od7v"]
 [ext_resource type="PackedScene" uid="uid://cx6rd40fopxwq" path="res://Player/tank_controller.tscn" id="3_qc4db"]
 [ext_resource type="PackedScene" uid="uid://bfr3crcaox8lr" path="res://Player/cart.tscn" id="4_ys1qc"]
 

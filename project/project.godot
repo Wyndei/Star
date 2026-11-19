@@ -17,8 +17,6 @@ config/icon="res://icon.svg"
 
 [display]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
 window/size/always_on_top=true
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
@@ -86,6 +84,13 @@ ScrollDown={
 
 [layer_names]
 
+3d_render/layer_1="World"
+3d_render/layer_2="Screen"
+3d_render/layer_3="Player"
+3d_render/layer_4="Enemy"
+3d_render/layer_5="Neutral"
+3d_render/layer_6="TopLayerEffects"
+3d_render/layer_7="FluidEffects"
 3d_physics/layer_1="World"
 3d_physics/layer_2="Player"
 3d_physics/layer_3="Attack"
@@ -98,3 +103,30 @@ ScrollDown={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+
+[shader_globals]
+
+FloorDisplace={
+"type": "sampler2D",
+"value": ""
+}
+FluidDisplace={
+"type": "sampler2D",
+"value": ""
+}
+FloorHeight={
+"type": "sampler2D",
+"value": ""
+}
+FloorCamPos={
+"type": "vec2",
+"value": Vector2(10, 0)
+}
+FloorCamWidth={
+"type": "float",
+"value": 200.0
+}
+PlayerPosition={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}

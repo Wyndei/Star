@@ -11,7 +11,7 @@ floor_snap_length = 0.0
 script = ExtResource("1_dd5sc")
 
 [node name="Camera" type="Camera3D" parent="." unique_id=9452114]
-cull_mask = 1048511
+cull_mask = 1048479
 far = 20000.0
 
 [node name="CrossHair" type="ColorRect" parent="." unique_id=1635763562]

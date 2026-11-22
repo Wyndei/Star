@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ui7fpeuau5xv"]
 
-[ext_resource type="Material" uid="uid://biro3ukjcx06a" path="res://Scenes/Materials/wireframe.tres" id="1_adcqc"]
+[ext_resource type="Material" uid="uid://b8oqfos80kesi" path="res://Scenes/Materials/grid_material.tres" id="1_adcqc"]
 [ext_resource type="Biome" uid="uid://rdoor2frdeba" path="res://WorldData/biomes/TestBiome.tres" id="2_7staa"]
 [ext_resource type="Script" uid="uid://cqmaginlmrvk5" path="res://Scenes/World/chunk_tree.gd" id="3_adcqc"]
 [ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Environments/Def_Environment.tres" id="4_y0d6x"]

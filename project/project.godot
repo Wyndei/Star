@@ -130,3 +130,7 @@ PlayerPosition={
 "type": "vec3",
 "value": Vector3(0, 0, 0)
 }
+WaterDisplace={
+"type": "sampler2D",
+"value": ""
+}

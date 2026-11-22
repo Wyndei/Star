@@ -22,6 +22,10 @@ void ChunkLeaf::_bind_methods() {
     ClassDB::bind_method(D_METHOD("generate_mesh"), &ChunkLeaf::generate_mesh);
     ClassDB::bind_method(D_METHOD("set_mesh", "surface_array"), &ChunkLeaf::set_mesh);
 
+    ClassDB::bind_method(D_METHOD("start_objects"), &ChunkLeaf::start_objects);
+    ClassDB::bind_method(D_METHOD("set_chunk_multimesh", "new_mm", "i"), &ChunkLeaf::set_chunk_multimesh);
+    
+
     // collisions
     ClassDB::bind_method(D_METHOD("generate_collision"), &ChunkLeaf::generate_collision);
     ClassDB::bind_method(D_METHOD("set_coll", "new_coll"), &ChunkLeaf::set_coll);
@@ -47,11 +51,20 @@ ChunkLeaf::~ChunkLeaf() {
         bot_right->queue_free();
     }
 
+    // for (int x = 0; x < mm.size(); x++){
+    //     mmi[x]->queue_free();
+    //     mm[x] = nullptr;
+    // }
+
     top_left = nullptr; 
     top_right = nullptr;
     bot_left = nullptr;
     bot_right = nullptr;
-    
+
+
+    if (chunk_mesh != nullptr){chunk_mesh->queue_free();}
+    if (chunk_body != nullptr){chunk_body->queue_free();}
+    if (chunk_coll != nullptr){chunk_coll->queue_free();}
 }
 
 void ChunkLeaf::_ready(){
@@ -60,38 +73,12 @@ void ChunkLeaf::_ready(){
 }
 
 void ChunkLeaf::generate_visual(){
-    WorkerThreadPool* pool = WorkerThreadPool::get_singleton();
-    
-    int hlf_size = get_size()/2;
 
-    // chunk_thread->start(gen_mesh);
-
-    chunk_mesh = memnew(MeshInstance3D); // mesh init
-    chunk_coll = memnew(CollisionShape3D); // collision init
-
-    generate_mesh();
-
-    generate_objects();
-
-    // Callable gen_mesh = callable_mp(this, &ChunkLeaf::generate_mesh);
-    // int64_t task_id = pool->add_task(gen_mesh, false, "mesh_generation");
-    // pool->wait_for_task_completion(task_id);
-
-    
-    add_child(chunk_mesh);
-    
-    chunk_mesh->set_position(Vector3(pos.x, 0.0, pos.y));
-    chunk_mesh->set_material_override(tree->get_material());
-
-
-
-    if (Engine::get_singleton()->is_editor_hint()) {
-        return;
-    }
-    if (level == 0){
-        Callable gen_coll = Callable(this, "generate_collision");
+    if (level == 0 && !Engine::get_singleton()->is_editor_hint()){
+        // Callable gen_coll = Callable(this, "generate_collision");
 
         chunk_body = memnew(StaticBody3D); // body init
+        chunk_coll = memnew(CollisionShape3D); // collision init
         add_child(chunk_body);
 
         chunk_body->add_child(chunk_coll);
@@ -99,6 +86,18 @@ void ChunkLeaf::generate_visual(){
         // chunk_coll->set_shape(generate_collision());
 
     }
+
+
+    chunk_mesh = memnew(MeshInstance3D); // mesh init
+
+    generate_mesh();
+    // start_objects();
+
+    add_child(chunk_mesh);
+    
+    chunk_mesh->set_position(Vector3(pos.x, 0.0, pos.y));
+    chunk_mesh->set_material_override(tree->get_material());
+
    
     // chunk tester
     // test_mesh = memnew(MeshInstance3D); // marker for each chunk
@@ -205,27 +204,66 @@ void ChunkLeaf::collapse(){
 
 }
 
-void ChunkLeaf::generate_objects(){
-    if (level > 4) return; // limited to closer chunks
+void ChunkLeaf::start_objects(){
 
     Ref<Biome> biome = tree->get_biome();
-    if (biome.is_null() || chunk_mesh == nullptr) {UtilityFunctions::print("Biome is null"); return;}
-
     TypedArray<Ref<ENVObj>> env_objects = biome->get_env_objects();
     int mm_count = env_objects.size();
     if (mm_count == 0 ){UtilityFunctions::print("No Objects"); return;}
 
-    std::vector<std::vector<Vector3>> positions;
-    positions.resize(mm_count);
-
+    // only touch things in the tree on main thread
     // set up multimeshes
     mm.clear();
     mm.resize(mm_count);
     mmi.clear();
     mmi.resize(mm_count);
 
-    for (int x = 0; x < mm_count; x++){
-        
+    // set up multithreading
+
+    WorkerThreadPool* pool = WorkerThreadPool::get_singleton();
+    
+    Callable gen_obj = callable_mp(this, &ChunkLeaf::generate_objects);
+    int64_t task_id = pool->add_task(gen_obj, false, "mesh_generation");
+    pool->wait_for_task_completion(task_id);
+
+
+    // generate_objects();
+}
+
+void ChunkLeaf::generate_objects(){
+    if (level > 4) return; // limited to closer chunks
+
+    Ref<Biome> biome = tree->get_biome();
+    if (biome.is_null() || chunk_mesh == nullptr) {UtilityFunctions::print("Biome is null"); return;}
+    
+    TypedArray<Ref<ENVObj>> env_objects = biome->get_env_objects();
+    
+    int mm_count = env_objects.size();
+    if (mm_count == 0 ){UtilityFunctions::print("No Objects"); return;}
+
+    std::vector<std::vector<Vector3>> positions;
+    positions.resize(mm_count);
+
+    int size = get_size();
+    for (int x = 0; x < size; x++){ // fill positions arrays
+        for (int y = 0; y < size; y++){
+
+            Vector2 world_pos = Vector2(x+pos.x,y+pos.y);
+            int obj_idx = get_object_index(env_objects, world_pos);
+            
+            if (obj_idx < -1 || obj_idx >= mm_count){UtilityFunctions::print("Object Index is null"); continue;}
+
+            if (obj_idx != -1){ // -1 means no object
+                Vector3 obj_pos = Vector3(x, tree->get_height(world_pos),y);
+                positions[obj_idx].push_back(obj_pos);
+            }
+        }
+    }
+
+    for (int x = 0; x < mm_count; x++){ // set up multimeshes
+        Ref<MultiMesh> new_mm;
+        new_mm.instantiate();
+
         Ref<ENVObj> object = env_objects[x];
         if (object.is_null()) {UtilityFunctions::print("object is null"); continue;}
         Ref<LODMesh> lod_mesh = object->get_lod_mesh();
@@ -244,41 +282,29 @@ void ChunkLeaf::generate_objects(){
 
         if (new_mesh.is_null()){UtilityFunctions::print("New LOD Mesh is null"); continue;}
 
-        mm[x].instantiate();
-        mm[x]->set_transform_format(MultiMesh::TRANSFORM_3D);
-        mm[x]->set_mesh(new_mesh);
-    }
+        new_mm->set_transform_format(MultiMesh::TRANSFORM_3D);
+        new_mm->set_mesh(new_mesh);
 
-    int size = get_size();
-    for (int x = 0; x < size; x++){
-        for (int y = 0; y < size; y++){
-
-            Vector2 world_pos = Vector2(x+pos.x,y+pos.y);
-            int obj_idx = get_object_index(env_objects, world_pos);
-            
-            if (obj_idx < -1 || obj_idx >= mm_count){UtilityFunctions::print("Object Index is null"); continue;}
-
-            if (obj_idx != -1){ // -1 means no object
-                Vector3 obj_pos = Vector3(x, tree->get_height(world_pos),y);
-                positions[obj_idx].push_back(obj_pos);
-            }
-        }
-    }
-
-    for (int x = 0; x < mm_count; x++){
-        if (mm[x].is_null()){UtilityFunctions::print("MM is invalid"); continue;}
+        if (new_mm.is_null()){UtilityFunctions::print("MM is invalid"); continue;}
         if (positions[x].empty()){continue;} // if positions is empty
 
-        mm[x]->set_instance_count(positions[x].size()); // increase instance count by one
+        new_mm->set_instance_count(positions[x].size()); // increase instance count by one
         for (int y = 0; y < positions[x].size(); y++){
             Transform3D xform = Transform3D(Basis(), positions[x][y]);
-            mm[x]->set_instance_transform(y, xform); // set this instance position
+            new_mm->set_instance_transform(y, xform); // set this instance position
         }
-
-        mmi[x] = memnew(MultiMeshInstance3D);
-        mmi[x]->set_multimesh(mm[x]);
-        chunk_mesh->add_child(mmi[x]);
+        
+        call_deferred("set_chunk_multimesh", new_mm, x);
     }
+}
+
+void ChunkLeaf::set_chunk_multimesh(Ref<MultiMesh> new_mm, int i){
+    if (!new_mm.is_valid()){UtilityFunctions::print("new_mm not valid"); return;}
+
+    mm[i] = new_mm;
+    mmi[i]= memnew(MultiMeshInstance3D);
+    mmi[i]->set_multimesh(mm[i]);
+    chunk_mesh->add_child(mmi[i]);
 }
 
 int ChunkLeaf::get_object_index(TypedArray<Ref<ENVObj>> env_objects, Vector2 pos){
@@ -397,6 +423,8 @@ void ChunkLeaf::set_mesh(Array surface_array){
 }
 
 void ChunkLeaf::generate_collision(){
+    if (chunk_coll == nullptr){return;}
+
     Ref<Mesh> mesh = chunk_mesh->get_mesh();
 
     chunk_coll->set_shape(mesh->create_trimesh_shape());
@@ -555,3 +583,7 @@ Vector2 ChunkTree::get_gradient(Vector2 coord, float epsilon){ // I want to impl
 	float dy = get_height(Vector2(coord.x, coord.y - epsilon)) - get_height(Vector2(coord.x, coord.y + epsilon));
 	return Vector2(dx, dy) / (2.0 * epsilon);
 }
+
+// bool DivLeaf::operator<(const DivLeaf& other) const {
+//         return leaf->get_level() < other.leaf->get_level();
+// }

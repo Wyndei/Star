@@ -1,0 +1,127 @@
+[gd_scene format=3 uid="uid://dnhljr75oj4kd"]
+
+[ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Environments/Def_Environment.tres" id="1_vwc78"]
+[ext_resource type="Shader" uid="uid://dto21ttgghfpx" path="res://Scenes/Test/snow_test.gdshader" id="2_c5j1u"]
+[ext_resource type="Script" uid="uid://cvlcm1ib0atmm" path="res://Scenes/Test/floor_deform_sub_v.gd" id="3_8kxhp"]
+[ext_resource type="PackedScene" uid="uid://dyxoxdvt6jpbx" path="res://Player/spectator.tscn" id="4_nfsrb"]
+[ext_resource type="Texture2D" uid="uid://biu8a0o1ca2vx" path="res://icon.svg" id="5_wq3rv"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a3647"]
+render_priority = 0
+shader = ExtResource("2_c5j1u")
+shader_parameter/floor_color = Color(0.34, 0.187, 0.187, 1)
+shader_parameter/top_color = Color(1, 1, 1, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tdppy"]
+material = SubResource("ShaderMaterial_a3647")
+size = Vector2(50, 50)
+subdivide_width = 20
+subdivide_depth = 20
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_s1ikr"]
+data = PackedVector3Array(100, 0, 100, -100, 0, 100, 100, 0, -100, -100, 0, 100, -100, 0, -100, 100, 0, -100)
+
+[sub_resource type="Environment" id="Environment_o4728"]
+background_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_l8h54"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.17924528, 0.7264151)
+colors = PackedColorArray(1, 0, 0, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_tdppy"]
+gradient = SubResource("Gradient_l8h54")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 0)
+
+[node name="SnowTest" type="Node3D" unique_id=1011107516]
+
+[node name="Env" type="Node3D" parent="." unique_id=227963755]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Env" unique_id=2127031404]
+environment = ExtResource("1_vwc78")
+
+[node name="Sun" type="DirectionalLight3D" parent="Env" unique_id=1957300197]
+transform = Transform3D(1, 0, 0, 0, -0.5919185, 0.80599785, 0, -0.80599785, -0.5919185, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=893735433]
+mesh = SubResource("PlaneMesh_tdppy")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Floor" unique_id=739807819]
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D" unique_id=782281559]
+shape = SubResource("ConcavePolygonShape3D_s1ikr")
+
+[node name="FloorDeformSubV" type="SubViewport" parent="." unique_id=2065760154 node_paths=PackedStringArray("pivot", "cam", "target", "write_test_rect", "prev_test_rect", "curr_test_rect", "next_test_rect")]
+size = Vector2i(1000, 1000)
+script = ExtResource("3_8kxhp")
+pivot = NodePath("Pivot")
+cam = NodePath("Pivot/FloorDeformCam")
+target = NodePath("../Spectator")
+write_test_rect = NodePath("../HBoxContainer/ImageTest")
+prev_test_rect = NodePath("../HBoxContainer/ImageTest2")
+curr_test_rect = NodePath("../HBoxContainer/ImageTest3")
+next_test_rect = NodePath("../HBoxContainer/ImageTest4")
+
+[node name="Pivot" type="Node3D" parent="FloorDeformSubV" unique_id=828802645]
+
+[node name="FloorDeformCam" type="Camera3D" parent="FloorDeformSubV/Pivot" unique_id=1387129918]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 150, 0)
+keep_aspect = 0
+cull_mask = 32
+environment = SubResource("Environment_o4728")
+projection = 1
+size = 100.0
+far = 500.0
+
+[node name="Spectator" parent="." unique_id=762592508 instance=ExtResource("4_nfsrb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=233536856]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -500.0
+offset_right = 500.0
+offset_bottom = 300.0
+grow_horizontal = 2
+theme_override_constants/separation = 0
+
+[node name="ImageTest" type="TextureRect" parent="HBoxContainer" unique_id=1779156542]
+custom_minimum_size = Vector2(250, 250)
+custom_maximum_size = Vector2(250, 250)
+layout_mode = 2
+texture = ExtResource("5_wq3rv")
+expand_mode = 2
+
+[node name="ImageTest2" type="TextureRect" parent="HBoxContainer" unique_id=1066895031]
+custom_minimum_size = Vector2(250, 250)
+custom_maximum_size = Vector2(250, 250)
+layout_mode = 2
+texture = ExtResource("5_wq3rv")
+expand_mode = 2
+
+[node name="ImageTest3" type="TextureRect" parent="HBoxContainer" unique_id=871600888]
+custom_minimum_size = Vector2(250, 250)
+custom_maximum_size = Vector2(250, 250)
+layout_mode = 2
+texture = ExtResource("5_wq3rv")
+expand_mode = 2
+
+[node name="ImageTest4" type="TextureRect" parent="HBoxContainer" unique_id=1442077965]
+custom_minimum_size = Vector2(250, 250)
+custom_maximum_size = Vector2(250, 250)
+layout_mode = 2
+texture = ExtResource("5_wq3rv")
+expand_mode = 2
+
+[node name="FloorDeform" type="Sprite3D" parent="." unique_id=768924698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+layers = 32
+pixel_size = 0.06
+axis = 1
+alpha_cut = 1
+texture = SubResource("GradientTexture2D_tdppy")

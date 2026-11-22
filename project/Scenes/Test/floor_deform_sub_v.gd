@@ -1,5 +1,7 @@
 extends SubViewport
 
+@export var shader_path : String
+
 @export var pivot : Node3D
 @export var cam : Camera3D
 @export var target : Node3D
@@ -64,9 +66,6 @@ func _process(_delta: float) -> void:
 	write_test_rect.texture = get_texture()
 	ping_state = wrapi(ping_state + 1, 0, 3)
 	RenderingServer.call_on_render_thread(func(): run_shader(ping_state))
-
-
-
 
 func run_shader(curr_state : int = 0):
 	
@@ -192,7 +191,7 @@ func init_shader():
 	curr_test_rect.texture = curr
 	next_test_rect.texture = next
 	
-	var new_shader := load("res://Compute/Snow.glsl")
+	var new_shader := load(shader_path)
 	var spirv: RDShaderSPIRV = new_shader.get_spirv()
 	shader = rd.shader_create_from_spirv(spirv)
 	pipeline = rd.compute_pipeline_create(shader)

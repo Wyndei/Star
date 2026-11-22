@@ -26,7 +26,7 @@ func _ready() -> void:
 	player.global_position.y = get_height(player_pos) + 1.0
 	
 	#chunk_update_timer.start()
-	
+
 func update():
 	var player_pos : Vector2i = Vector2i(int(floor(player.position.x)),int(floor(player.position.z)))
 	chunk_updates(player_pos)
@@ -42,4 +42,5 @@ func subdivide_chunks():
 
 func _on_chunk_update_timeout() -> void:
 	#print("timer")
+	print_orphan_nodes()
 	subdivide_chunks()

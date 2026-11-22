@@ -50,6 +50,7 @@ shadow_enabled = true
 mesh = SubResource("PlaneMesh_tdppy")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Floor" unique_id=739807819]
+visible = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D" unique_id=782281559]
 shape = SubResource("ConcavePolygonShape3D_s1ikr")

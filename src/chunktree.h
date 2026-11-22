@@ -72,10 +72,10 @@ class ChunkLeaf : public Leaf{
         bool has_children = false;
         bool queued = false;
 
-        MeshInstance3D *test_mesh;
-        MeshInstance3D *chunk_mesh;
-        StaticBody3D *chunk_body;
-        CollisionShape3D *chunk_coll;
+        MeshInstance3D *test_mesh = nullptr;
+        MeshInstance3D *chunk_mesh = nullptr;
+        StaticBody3D *chunk_body = nullptr;
+        CollisionShape3D *chunk_coll = nullptr;
 
         std::vector<Ref<MultiMesh>> mm;
         std::vector<MultiMeshInstance3D *> mmi; 
@@ -116,6 +116,7 @@ class ChunkLeaf : public Leaf{
     void set_mesh(Array surface_array);
     void set_coll(Ref<ConcavePolygonShape3D> new_coll);
 
+
     bool should_subdivide(Vector2i player_pos);
     bool should_collapse(Vector2i player_pos);
 
@@ -125,7 +126,9 @@ class ChunkLeaf : public Leaf{
     void collapse();
 
     void generate_visual();
+    void start_objects();
     void generate_objects();
+    void set_chunk_multimesh(Ref<MultiMesh> new_mm, int i);
 
     int get_object_index(TypedArray<Ref<ENVObj>> env_objects, Vector2 pos);
 };
@@ -135,6 +138,8 @@ struct DivLeaf {
     ChunkLeaf *leaf;
     bool subd = false;
     Vector2i player_pos;
+
+    // bool operator<(const DivLeaf& other) const;
 };
 
 class ChunkTree : public QuadTree {

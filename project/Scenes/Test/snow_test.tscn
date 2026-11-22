@@ -6,27 +6,8 @@
 [ext_resource type="Script" uid="uid://cvlcm1ib0atmm" path="res://Scenes/Test/floor_deform_sub_v.gd" id="4_iyipy"]
 [ext_resource type="Texture2D" uid="uid://biu8a0o1ca2vx" path="res://icon.svg" id="5_ffl23"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_a3647"]
-render_priority = 0
-shader = ExtResource("2_o4728")
-shader_parameter/floor_color = Color(0.34, 0.187, 0.187, 1)
-shader_parameter/top_color = Color(1, 1, 1, 1)
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_tdppy"]
-material = SubResource("ShaderMaterial_a3647")
-size = Vector2(50, 50)
-subdivide_width = 20
-subdivide_depth = 20
-
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_s1ikr"]
-data = PackedVector3Array(100, 0, 100, -100, 0, 100, 100, 0, -100, -100, 0, 100, -100, 0, -100, 100, 0, -100)
-
-[sub_resource type="Environment" id="Environment_o4728"]
-background_mode = 1
-
 [sub_resource type="Gradient" id="Gradient_l8h54"]
 interpolation_mode = 2
-offsets = PackedFloat32Array(0.17924528, 0.7264151)
 colors = PackedColorArray(1, 0, 0, 1, 0, 0, 0, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_tdppy"]
@@ -35,7 +16,34 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0, 0)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a3647"]
+render_priority = 0
+shader = ExtResource("2_o4728")
+shader_parameter/floor_color = Color(0.34, 0.187, 0.187, 1)
+shader_parameter/top_color = Color(1, 1, 1, 1)
+shader_parameter/ridge_height = 0.1999999955296
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tdppy"]
+material = SubResource("ShaderMaterial_a3647")
+size = Vector2(50, 50)
+subdivide_width = 200
+subdivide_depth = 200
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_s1ikr"]
+data = PackedVector3Array(100, 0, 100, -100, 0, 100, 100, 0, -100, -100, 0, 100, -100, 0, -100, 100, 0, -100)
+
+[sub_resource type="Environment" id="Environment_o4728"]
+background_mode = 1
+
 [node name="SnowTest" type="Node3D" unique_id=1011107516]
+
+[node name="FloorDeform" type="Sprite3D" parent="." unique_id=173662912]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1, 0)
+layers = 32
+pixel_size = 0.02
+axis = 1
+alpha_cut = 1
+texture = SubResource("GradientTexture2D_tdppy")
 
 [node name="Env" type="Node3D" parent="." unique_id=227963755]
 
@@ -43,7 +51,7 @@ fill_to = Vector2(0, 0)
 environment = ExtResource("1_o4728")
 
 [node name="Sun" type="DirectionalLight3D" parent="Env" unique_id=1957300197]
-transform = Transform3D(1, 0, 0, 0, -0.5919185, 0.80599785, 0, -0.80599785, -0.5919185, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 0.9992629, -0.03838781, 0, 0.03838781, 0.9992629, 0, 0, 0)
 shadow_enabled = true
 
 [node name="Floor" type="MeshInstance3D" parent="." unique_id=893735433]
@@ -56,7 +64,7 @@ visible = false
 shape = SubResource("ConcavePolygonShape3D_s1ikr")
 
 [node name="FloorDeformSubV" type="SubViewport" parent="." unique_id=2065760154 node_paths=PackedStringArray("pivot", "cam", "target", "write_test_rect", "prev_test_rect", "curr_test_rect", "next_test_rect")]
-size = Vector2i(1000, 1000)
+size = Vector2i(400, 400)
 script = ExtResource("4_iyipy")
 pivot = NodePath("Pivot")
 cam = NodePath("Pivot/FloorDeformCam")
@@ -80,48 +88,55 @@ far = 500.0
 [node name="Spectator" parent="." unique_id=762592508 instance=ExtResource("4_ffl23")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=233536856]
+[node name="FloorDeform" type="Sprite3D" parent="Spectator" unique_id=768924698]
+layers = 32
+pixel_size = 0.005
+axis = 1
+alpha_cut = 1
+texture = SubResource("GradientTexture2D_tdppy")
+
+[node name="HBoxContainer" type="GridContainer" parent="." unique_id=378501647]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -500.0
-offset_right = 500.0
-offset_bottom = 300.0
+offset_left = -564.0
+offset_top = 24.0
+offset_right = -160.0
+offset_bottom = 428.0
 grow_horizontal = 2
-theme_override_constants/separation = 0
+columns = 2
 
 [node name="ImageTest" type="TextureRect" parent="HBoxContainer" unique_id=1779156542]
-custom_minimum_size = Vector2(250, 250)
-custom_maximum_size = Vector2(250, 250)
+custom_minimum_size = Vector2(200, 200)
+custom_maximum_size = Vector2(200, 200)
 layout_mode = 2
 texture = ExtResource("5_ffl23")
 expand_mode = 2
 
 [node name="ImageTest2" type="TextureRect" parent="HBoxContainer" unique_id=1066895031]
-custom_minimum_size = Vector2(250, 250)
-custom_maximum_size = Vector2(250, 250)
+visible = false
+custom_minimum_size = Vector2(200, 200)
+custom_maximum_size = Vector2(200, 200)
 layout_mode = 2
 texture = ExtResource("5_ffl23")
 expand_mode = 2
 
 [node name="ImageTest3" type="TextureRect" parent="HBoxContainer" unique_id=871600888]
-custom_minimum_size = Vector2(250, 250)
-custom_maximum_size = Vector2(250, 250)
+visible = false
+custom_minimum_size = Vector2(200, 200)
+custom_maximum_size = Vector2(200, 200)
 layout_mode = 2
 texture = ExtResource("5_ffl23")
 expand_mode = 2
 
 [node name="ImageTest4" type="TextureRect" parent="HBoxContainer" unique_id=1442077965]
-custom_minimum_size = Vector2(250, 250)
-custom_maximum_size = Vector2(250, 250)
+custom_minimum_size = Vector2(200, 200)
+custom_maximum_size = Vector2(200, 200)
 layout_mode = 2
 texture = ExtResource("5_ffl23")
 expand_mode = 2
 
-[node name="FloorDeform" type="Sprite3D" parent="." unique_id=768924698]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-layers = 32
-pixel_size = 0.06
-axis = 1
-alpha_cut = 1
-texture = SubResource("GradientTexture2D_tdppy")
+[node name="TestTimer" type="Timer" parent="." unique_id=769939845]
+wait_time = 0.1
+
+[connection signal="timeout" from="TestTimer" to="FloorDeformSubV" method="_on_test_timer_timeout"]

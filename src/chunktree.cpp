@@ -91,7 +91,7 @@ void ChunkLeaf::generate_visual(){
     chunk_mesh = memnew(MeshInstance3D); // mesh init
 
     generate_mesh();
-    // start_objects();
+    start_objects();
 
     add_child(chunk_mesh);
     

@@ -3,8 +3,10 @@
 [ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Environments/Def_Environment.tres" id="1_o4728"]
 [ext_resource type="Shader" uid="uid://dto21ttgghfpx" path="res://Scenes/Test/snow_test.gdshader" id="2_o4728"]
 [ext_resource type="PackedScene" uid="uid://dyxoxdvt6jpbx" path="res://Player/spectator.tscn" id="4_ffl23"]
-[ext_resource type="Script" uid="uid://cvlcm1ib0atmm" path="res://Scenes/Test/floor_deform_sub_v.gd" id="4_iyipy"]
+[ext_resource type="Script" uid="uid://cvlcm1ib0atmm" path="res://Scenes/Test/floor_effects_vp.gd" id="4_iyipy"]
+[ext_resource type="Script" uid="uid://6cna2t72gdw2" path="res://Scenes/Test/snow_deform.gd" id="4_s1ikr"]
 [ext_resource type="Texture2D" uid="uid://biu8a0o1ca2vx" path="res://icon.svg" id="5_ffl23"]
+[ext_resource type="Script" uid="uid://caqyqcq5v0qbw" path="res://Scenes/Test/water_deform.gd" id="5_xdks5"]
 
 [sub_resource type="Gradient" id="Gradient_l8h54"]
 interpolation_mode = 2
@@ -40,6 +42,7 @@ background_mode = 1
 [node name="FloorDeform" type="Sprite3D" parent="." unique_id=173662912]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 1, 0)
 layers = 32
+cast_shadow = 0
 pixel_size = 0.02
 axis = 1
 alpha_cut = 1
@@ -63,16 +66,13 @@ visible = false
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D" unique_id=782281559]
 shape = SubResource("ConcavePolygonShape3D_s1ikr")
 
-[node name="FloorDeformSubV" type="SubViewport" parent="." unique_id=2065760154 node_paths=PackedStringArray("pivot", "cam", "target", "write_test_rect", "prev_test_rect", "curr_test_rect", "next_test_rect")]
+[node name="FloorDeformSubV" type="SubViewport" parent="." unique_id=2065760154 node_paths=PackedStringArray("pivot", "cam", "target")]
 size = Vector2i(400, 400)
 script = ExtResource("4_iyipy")
+shader_path = "res://Compute/Snow.glsl"
 pivot = NodePath("Pivot")
 cam = NodePath("Pivot/FloorDeformCam")
 target = NodePath("../Spectator")
-write_test_rect = NodePath("../HBoxContainer/ImageTest")
-prev_test_rect = NodePath("../HBoxContainer/ImageTest2")
-curr_test_rect = NodePath("../HBoxContainer/ImageTest3")
-next_test_rect = NodePath("../HBoxContainer/ImageTest4")
 
 [node name="Pivot" type="Node3D" parent="FloorDeformSubV" unique_id=828802645]
 
@@ -85,17 +85,36 @@ projection = 1
 size = 100.0
 far = 500.0
 
+[node name="SnowDeform" type="Node" parent="FloorDeformSubV" unique_id=326686501 node_paths=PackedStringArray("viewport", "write_test_rect", "prev_test_rect", "curr_test_rect", "next_test_rect")]
+script = ExtResource("4_s1ikr")
+shader_path = "res://Compute/Snow.glsl"
+viewport = NodePath("..")
+write_test_rect = NodePath("../../GridContainer/ImageTest")
+prev_test_rect = NodePath("../../GridContainer/ImageTest2")
+curr_test_rect = NodePath("../../GridContainer/ImageTest3")
+next_test_rect = NodePath("../../GridContainer/ImageTest4")
+
+[node name="WaterDeform" type="Node" parent="FloorDeformSubV" unique_id=225049800 node_paths=PackedStringArray("viewport", "write_test_rect", "prev_test_rect", "curr_test_rect", "next_test_rect")]
+script = ExtResource("5_xdks5")
+shader_path = "res://Compute/Water.glsl"
+viewport = NodePath("..")
+write_test_rect = NodePath("../../GridContainer/ImageTest5")
+prev_test_rect = NodePath("../../GridContainer/ImageTest6")
+curr_test_rect = NodePath("../../GridContainer/ImageTest7")
+next_test_rect = NodePath("../../GridContainer/ImageTest8")
+
 [node name="Spectator" parent="." unique_id=762592508 instance=ExtResource("4_ffl23")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7825327, 0)
 
 [node name="FloorDeform" type="Sprite3D" parent="Spectator" unique_id=768924698]
 layers = 32
+cast_shadow = 0
 pixel_size = 0.005
 axis = 1
 alpha_cut = 1
 texture = SubResource("GradientTexture2D_tdppy")
 
-[node name="HBoxContainer" type="GridContainer" parent="." unique_id=378501647]
+[node name="GridContainer" type="GridContainer" parent="." unique_id=378501647]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -106,14 +125,21 @@ offset_bottom = 428.0
 grow_horizontal = 2
 columns = 2
 
-[node name="ImageTest" type="TextureRect" parent="HBoxContainer" unique_id=1779156542]
+[node name="ImageTest" type="TextureRect" parent="GridContainer" unique_id=1779156542]
 custom_minimum_size = Vector2(200, 200)
 custom_maximum_size = Vector2(200, 200)
 layout_mode = 2
 texture = ExtResource("5_ffl23")
 expand_mode = 2
 
-[node name="ImageTest2" type="TextureRect" parent="HBoxContainer" unique_id=1066895031]
+[node name="ImageTest2" type="TextureRect" parent="GridContainer" unique_id=1066895031]
+custom_minimum_size = Vector2(200, 200)
+custom_maximum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("5_ffl23")
+expand_mode = 2
+
+[node name="ImageTest3" type="TextureRect" parent="GridContainer" unique_id=871600888]
 visible = false
 custom_minimum_size = Vector2(200, 200)
 custom_maximum_size = Vector2(200, 200)
@@ -121,7 +147,7 @@ layout_mode = 2
 texture = ExtResource("5_ffl23")
 expand_mode = 2
 
-[node name="ImageTest3" type="TextureRect" parent="HBoxContainer" unique_id=871600888]
+[node name="ImageTest4" type="TextureRect" parent="GridContainer" unique_id=1442077965]
 visible = false
 custom_minimum_size = Vector2(200, 200)
 custom_maximum_size = Vector2(200, 200)
@@ -129,9 +155,32 @@ layout_mode = 2
 texture = ExtResource("5_ffl23")
 expand_mode = 2
 
-[node name="ImageTest4" type="TextureRect" parent="HBoxContainer" unique_id=1442077965]
+[node name="ImageTest5" type="TextureRect" parent="GridContainer" unique_id=46893466]
 custom_minimum_size = Vector2(200, 200)
 custom_maximum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("5_ffl23")
+expand_mode = 2
+
+[node name="ImageTest6" type="TextureRect" parent="GridContainer" unique_id=192884213]
+visible = false
+custom_minimum_size = Vector2(200, 200)
+custom_maximum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("5_ffl23")
+expand_mode = 2
+
+[node name="ImageTest7" type="TextureRect" parent="GridContainer" unique_id=1070176755]
+visible = false
+custom_minimum_size = Vector2(200, 200)
+custom_maximum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("5_ffl23")
+expand_mode = 2
+
+[node name="ImageTest8" type="TextureRect" parent="GridContainer" unique_id=1184288015]
+custom_minimum_size = Vector2(500, 500)
+custom_maximum_size = Vector2(500, 500)
 layout_mode = 2
 texture = ExtResource("5_ffl23")
 expand_mode = 2

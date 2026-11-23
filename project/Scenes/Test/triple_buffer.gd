@@ -1,16 +1,14 @@
-extends SubViewport
+extends Node
+class_name TripleBufferCompute
 
 @export var shader_path : String
 
-@export var pivot : Node3D
-@export var cam : Camera3D
-@export var target : Node3D
+@export var viewport : SubViewport
 
 @export var write_test_rect : TextureRect
 @export var prev_test_rect : TextureRect
 @export var curr_test_rect : TextureRect
 @export var next_test_rect : TextureRect
-
 
 var rd: RenderingDevice
 
@@ -45,36 +43,20 @@ var c_set : RID
 var ping_state : int = 0 # 0 1 2
 
 var shader_ready : bool = false
-var pos_buffer : Vector2 = Vector2.ZERO
+
 
 func _ready() -> void:
 	await get_tree().process_frame #wait for tree to instantiate subviewport
 	
 	init_shader()
-	
-	RenderingServer.global_shader_parameter_set("FloorCamWidth", cam.size)
-	RenderingServer.global_shader_parameter_set("FloorDisplace", curr)
 
 func _process(_delta: float) -> void:
-	#pivot.global_position = target.global_position
-	#pivot.global_position = Vector3(snappedf(target.global_position.x, cam.size/size.x),target.global_position.y, \
-									#snappedf(target.global_position.z, cam.size/size.x))
-	#RenderingServer.global_shader_parameter_set("FloorDisplace", get_texture())
-	
 	if !shader_ready:
 		return
 	
-	write_test_rect.texture = get_texture()
+	write_test_rect.texture = viewport.get_texture()
 	ping_state = wrapi(ping_state + 1, 0, 3)
 	RenderingServer.call_on_render_thread(func(): run_shader(ping_state))
-
-
-func _on_test_timer_timeout() -> void:
-	pass
-	#write_test_rect.texture = get_texture()
-	#ping_state = wrapi(ping_state + 1, 0, 3)
-	#RenderingServer.call_on_render_thread(func(): run_shader(ping_state))
-
 
 
 func run_shader(curr_state : int = 0):
@@ -90,15 +72,11 @@ func run_shader(curr_state : int = 0):
 			u_set = c_set
 			rd.texture_clear(b_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
 	
-	var texel_size := Vector2(cam.size / size.x, cam.size / size.y)
-	var curr_texel := Vector2i(floori(target.global_position.x / texel_size.x),floori(target.global_position.z / texel_size.y))
-	var prev_texel := Vector2i(floori(pos_buffer.x / texel_size.x),floori(pos_buffer.y / texel_size.y))
-	
 	var push_constant : PackedFloat32Array = PackedFloat32Array([
-		curr_texel.x,
-		curr_texel.y,
-		prev_texel.x,
-		prev_texel.y
+		viewport.curr_texel.x,
+		viewport.curr_texel.y,
+		viewport.prev_texel.x,
+		viewport.prev_texel.y
 	])
 	var push_constant_bytes = push_constant.to_byte_array()
 	
@@ -113,18 +91,12 @@ func run_shader(curr_state : int = 0):
 	rd.compute_list_dispatch(compute_list, 32,32,1)
 	rd.compute_list_end()
 	
-	#pivot.global_position = target.global_position
-	pivot.global_position = Vector3(curr_texel.x * texel_size.x, target.global_position.y, curr_texel.y * texel_size.y)
-	pos_buffer = Vector2(target.global_position.x, target.global_position.z)
-	
-	RenderingServer.global_shader_parameter_set("FloorCamPos", Vector2(curr_texel.x * texel_size.x, curr_texel.y * texel_size.y))
-	
 
 func init_shader():
 	
 	rd = RenderingServer.get_rendering_device() 
 	
-	var vp_tex_rid : RID = get_texture().get_rid()
+	var vp_tex_rid : RID = viewport.get_texture().get_rid()
 	var vp_rd_rid : RID = RenderingServer.texture_get_rd_texture(vp_tex_rid)
 	var vp_format: RDTextureFormat = rd.texture_get_format(vp_rd_rid)
 	

@@ -2,7 +2,7 @@
 
 [ext_resource type="Environment" uid="uid://cavwmwx35rx3q" path="res://Scenes/Environments/Def_Environment.tres" id="1_vwc78"]
 [ext_resource type="Shader" uid="uid://dto21ttgghfpx" path="res://Scenes/Test/snow_test.gdshader" id="2_c5j1u"]
-[ext_resource type="Script" uid="uid://cvlcm1ib0atmm" path="res://Scenes/Test/floor_deform_sub_v.gd" id="3_8kxhp"]
+[ext_resource type="Script" uid="uid://cvlcm1ib0atmm" path="res://Scenes/Test/floor_effects_vp.gd" id="3_8kxhp"]
 [ext_resource type="PackedScene" uid="uid://dyxoxdvt6jpbx" path="res://Player/spectator.tscn" id="4_nfsrb"]
 [ext_resource type="Texture2D" uid="uid://biu8a0o1ca2vx" path="res://icon.svg" id="5_wq3rv"]
 

@@ -50,7 +50,11 @@ void main(){
     new_color.g = get_avg(write_color.r, prev_p, curr_p, max_coord);
     new_color.b = get_ridge(prev_p, curr_p, max_coord);
 
-    imageStore(Next, p, vec4(new_color, 1.0));
+    // imageStore(Next, p, vec4(new_color, 1.0));
+
+
+    imageStore(Next, p, vec4(write_color.rgb,1.0));
+
 }
 
 float get_ridge(ivec2 prev_p, ivec2 curr_p, ivec2 max_coord) {

@@ -33,8 +33,8 @@ void fragment() {
 	float floor_threshold = 0.01;
 	vec3 color = mix(floor_color,top_color,clamp(displace_height+floor_threshold+floor_displace.b*2.0,0.0,1.0));
 	ALBEDO = vec3(color);
-	//ALBEDO = vec3(floor_displace);
-	ALBEDO = vec3(displace_height * 0.5);
+	ALBEDO = vec3(floor_displace);
+	//ALBEDO = vec3(displace_height * 0.5);
 }
 
 //void light() {

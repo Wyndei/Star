@@ -28,7 +28,7 @@ var next_a_u : RDUniform
 var next_b_u : RDUniform
 var next_c_u : RDUniform
 
-#var write : Texture2DRD
+var write : Texture2DRD
 var prev : Texture2DRD
 var curr : Texture2DRD
 var next : Texture2DRD
@@ -45,10 +45,10 @@ var ping_state : int = 0 # 0 1 2
 var shader_ready : bool = false
 
 
-func _ready() -> void:
-	await get_tree().process_frame #wait for tree to instantiate subviewport
-	
-	init_shader()
+#func _ready() -> void:
+	#await get_tree().process_frame #wait for tree to instantiate subviewport
+	#
+	#init_shader()
 
 func _process(_delta: float) -> void:
 	if !shader_ready:
@@ -64,13 +64,13 @@ func run_shader(curr_state : int = 0):
 	match curr_state:
 		0:
 			u_set = a_set
-			rd.texture_clear(c_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
+			#rd.texture_clear(c_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
 		1:
 			u_set = b_set
-			rd.texture_clear(a_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
+			#rd.texture_clear(a_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
 		2:
 			u_set = c_set
-			rd.texture_clear(b_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
+			#rd.texture_clear(b_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
 	
 	var push_constant : PackedFloat32Array = PackedFloat32Array([
 		viewport.curr_texel.x,
@@ -79,9 +79,7 @@ func run_shader(curr_state : int = 0):
 		viewport.prev_texel.y
 	])
 	var push_constant_bytes = push_constant.to_byte_array()
-	
-	
-	
+
 	var compute_list := rd.compute_list_begin()
 	rd.compute_list_bind_compute_pipeline(compute_list, pipeline)
 	rd.compute_list_bind_uniform_set(compute_list, u_set, 0)
@@ -91,10 +89,16 @@ func run_shader(curr_state : int = 0):
 	rd.compute_list_dispatch(compute_list, 32,32,1)
 	rd.compute_list_end()
 	
+	
 
 func init_shader():
-	
 	rd = RenderingServer.get_rendering_device() 
+	
+	var new_shader := load(shader_path)
+	var spirv: RDShaderSPIRV = new_shader.get_spirv()
+	shader = rd.shader_create_from_spirv(spirv)
+	pipeline = rd.compute_pipeline_create(shader)
+	
 	
 	var vp_tex_rid : RID = viewport.get_texture().get_rid()
 	var vp_rd_rid : RID = RenderingServer.texture_get_rd_texture(vp_tex_rid)
@@ -196,21 +200,20 @@ func init_shader():
 	next = Texture2DRD.new()                    
 	next.texture_rd_rid = c_rid
 	
+	write = Texture2DRD.new()                    
+	write.texture_rd_rid = c_rid
+	
 	prev_test_rect.texture = prev
 	curr_test_rect.texture = curr
 	next_test_rect.texture = next
-	
-	var new_shader := load(shader_path)
-	var spirv: RDShaderSPIRV = new_shader.get_spirv()
-	shader = rd.shader_create_from_spirv(spirv)
-	pipeline = rd.compute_pipeline_create(shader)
+	#write_test_rect.texture = write
 	
 	a_set = rd.uniform_set_create([write_u, prev_a_u, curr_a_u, next_a_u], shader, 0)
 	b_set = rd.uniform_set_create([write_u, prev_b_u, curr_b_u, next_b_u], shader, 0)
 	c_set = rd.uniform_set_create([write_u, prev_c_u, curr_c_u, next_c_u], shader, 0)
 	
-	rd.texture_clear(a_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
-	rd.texture_clear(b_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
-	rd.texture_clear(c_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
+	#rd.texture_clear(a_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
+	#rd.texture_clear(b_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
+	#rd.texture_clear(c_rid,Color(0.0,0.0,0.0,1.0),0,1,0,1)
 	
 	shader_ready = true
